@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Маг Бездны</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Philosopher:wght@400;700&family=Exo+2:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="app">
+  <div id="stage">
+    <canvas id="cv"></canvas>
+    <div class="hud">
+      <div class="hero-card">
+        <div class="pic" id="pic"></div>
+        <div class="hero-meta">
+          <div class="lvl"><b>Ур. <span class="num" id="lvl" style="color:var(--fg)">1</span></b><span id="dpsS" class="num bm"></span></div>
+          <div class="bar hp"><i id="hpb"></i><b id="hpt"></b></div>
+          <div class="bar xp"><i id="xpb"></i></div>
+        </div>
+      </div>
+      <div class="hud-l"><div class="pot-bar" id="potBar"></div></div>
+      <div class="res">
+        <div class="chip gold"><span class="coin"></span><b id="gold" class="num">0</b></div>
+        <div class="chip stone"><img class="stn" id="stoneIco" alt=""><b id="stones" class="num">0</b></div>
+        <button class="chip shopb" id="shopBtn"><img data-na="shop" alt=""><span>Магазин</span></button>
+      </div>
+    </div>
+    <div class="zone">
+      <h2 id="zname"></h2>
+      <div class="pips" id="pips"></div>
+      <div class="timer" id="btimer" hidden></div>
+    </div>
+    <div class="banner" id="banner"></div>
+    <div class="chatpanel" id="chatPanel" hidden>
+      <div class="chat-head"><b>Чат</b><span id="chatState"></span><button id="chatClose" aria-label="Закрыть чат">✕</button></div>
+      <div class="chat-list" id="chatList"></div>
+      <form class="chat-form" id="chatForm"><input id="chatIn" maxlength="140" autocomplete="off" placeholder="Сообщение…" aria-label="Сообщение"><button id="chatSend">➤</button></form>
+    </div>
+    <div class="controls">
+      <button class="chatbar" id="chatBar" aria-label="Открыть чат"><span class="chatico"><svg viewBox="0 0 16 16" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M2 2h12v1h1v8h-1v1H7l-3 3v-3H2v-1H1V3h1z"/><path fill="#120d19" d="M4 6h2v2H4zM7 6h2v2H7zM10 6h2v2h-2z"/></svg><i id="chatDot" hidden></i></span><span class="chatlast" id="chatLast"><span class="cm">Чат</span></span></button>
+      <div class="skills" id="skills"></div>
+      <div class="toggles">
+        <button class="tg" id="tgAuto" aria-pressed="true">АВТО</button>
+        <button class="tg" id="tgFast" aria-pressed="false">x2</button>
+      </div>
+    </div>
+    <div class="sheet" id="sheet" aria-hidden="true">
+      <div class="sheet-head" id="sheetHead"><span class="sp"></span><h2 id="sheetTitle">Герой</h2><button class="sheet-close" id="sheetClose" aria-label="Закрыть">✕</button></div>
+    <div class="stats">
+      <span>Урон/сек <b id="dps">0</b></span>
+      <span>Рекорд <b id="best">1</b></span>
+      <div class="mult" id="mult"><button data-m="1" class="on">x1</button><button data-m="10">x10</button><button data-m="0">MAX</button></div>
+    </div>
+      <div class="list" id="list"></div>
+    </div>
+    <div class="modal" id="modal" hidden></div>
+    <div id="err" hidden style="position:absolute;left:10px;right:10px;top:110px;padding:8px 10px;background:#2a1040;border:1px solid var(--blood);border-radius:6px;font-size:12px;z-index:6"></div>
+  </div>
+  <nav class="nav" role="tablist">
+    <button class="tab on" data-tab="battle" id="tab-battle"><span class="nb"><img data-na="battle" alt=""></span><span class="tl">Бой</span></button>
+    <button class="tab" data-tab="hero" id="tab-hero"><span class="nb"><img data-na="hero" alt=""></span><span class="tl">Улучшения</span><i class="dot" id="dot-hero" hidden></i></button>
+    <button class="tab" data-tab="skill" id="tab-skill"><span class="nb"><img data-na="skill" alt=""></span><span class="tl">Умения</span><i class="dot" id="dot-skill" hidden></i></button>
+    <button class="tab" data-tab="bag" id="tab-bag"><span class="nb"><img data-na="bag" alt=""></span><span class="tl">Сумка</span><i class="dot" id="dot-bag" hidden></i></button>
+    <button class="tab" data-tab="map" id="tab-map"><span class="nb"><img data-na="map" alt=""></span><span class="tl">Локации</span></button>
+    <button class="tab" data-tab="profile" id="tab-profile"><span class="nb"><img data-na="profile" alt=""></span><span class="tl">Профиль</span></button>
+  </nav>
+    <div class="picker" id="picker" hidden role="dialog" aria-label="Выбор героя">
+      <canvas id="pkBg" class="pk-bg"></canvas>
+      <button class="pk-x" id="pkClose" aria-label="Закрыть">✕</button>
+      <div class="pk-info" id="pkInfo"></div>
+      <div class="pk-scene" id="pkScene"><button class="pk-arr" id="pkPrev" aria-label="Предыдущий герой">‹</button><span class="pk-hint">Нажми на героя, чтобы выбрать</span><button class="pk-arr" id="pkNext" aria-label="Следующий герой">›</button></div>
+      <button class="pk-go" id="pkGo">Выбрать героя</button>
+    </div>
+</div>
+
+<script src="js/data/assets.js"></script>
+<script src="js/data/frames.js"></script>
+<script src="js/core/helpers.js"></script>
+<script src="js/world/themes.js"></script>
+<script src="js/world/bestiary.js"></script>
+<script src="js/world/locations.js"></script>
+<script src="js/world/ambient.js"></script>
+<script src="js/render/canvas.js"></script>
+<script src="js/core/state.js"></script>
+<script src="js/game/stats.js"></script>
+<script src="js/game/potions.js"></script>
+<script src="js/game/heroes.js"></script>
+<script src="js/core/images.js"></script>
+<script src="js/game/runtime.js"></script>
+<script src="js/audio/sound.js"></script>
+<script src="js/game/combat.js"></script>
+<script src="js/render/draw.js"></script>
+<script src="js/ui/hud.js"></script>
+<script src="js/items/equipment.js"></script>
+<script src="js/items/item-icons.js"></script>
+<script src="js/items/inventory.js"></script>
+<script src="js/ui/bag.js"></script>
+<script src="js/ui/map.js"></script>
+<script src="js/ui/nav.js"></script>
+<script src="js/data/pet-sprites.js"></script>
+<script src="js/game/pets.js"></script>
+<script src="js/game/capes.js"></script>
+<script src="js/ui/shop.js"></script>
+<script src="js/ui/panel.js"></script>
+<script src="js/game/offline.js"></script>
+<script src="js/ui/picker.js"></script>
+<script src="js/net/chat.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
