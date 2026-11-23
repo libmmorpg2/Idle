@@ -29,7 +29,7 @@ const SPLASH=(()=>{
              asn:{a:'atk',dur:.55,hit:.25,proj:'knife',cd:.55},sam:{a:'atk',dur:1.0,hit:.56,proj:'arrow',cd:.95}};
   const SPEC={mage:{a:'pow',dur:1.1,hit:.45},tank:{a:'heavy',dur:.8,hit:.45},asn:{a:'combo',dur:1.1,hit:.6},sam:{a:'sp',dur:.8,hit:.5}};
   const IDLEF={mage:9,tank:8,asn:9,sam:10};
-  const MOBS=['slime','mushroom','bat','skeleton','wolf','wisp','ghost','eye','imp','spider','wraith','goblin','toad','beetle','snake','zombie','salamander','crab','moth','jelly','cultist','mosquito','croc','leech'];
+  const MOBS=Object.keys(MON).filter(t=>!MON[t].big);
   const FLY=t=>MON[t]&&MON[t].mv==='fly';
 
   function frameOf(id,anim,t,fps,once){
@@ -44,9 +44,9 @@ const SPLASH=(()=>{
     c.restore();
   }
   function drawMob(e,x,y,s){   // спрайты монстров смотрят вправо — разворачиваем к героям
-    const fr=Math.floor(e.t*(FLY(e.type)?8:5))%2, spr=enemySprite(e.type,fr,e.flash>0,e.boss);
+    const spr=enemySprite(e.type,Math.floor(e.t*7),e.flash>0,e.boss,false,'run'), k=(MON[e.type]||{}).k||1;
     c.save(); c.translate(Math.round(x),Math.round(y)); if(!e.faceR) c.scale(-1,1); c.globalAlpha=e.alpha==null?1:e.alpha;
-    c.drawImage(spr,Math.round(-8*s),Math.round(-spr.height*s),Math.round(16*s),Math.round(spr.height*s)); c.restore();
+    c.drawImage(spr,Math.round(-spr.width*k*s/2),Math.round(-spr.height*k*s),Math.round(spr.width*k*s),Math.round(spr.height*k*s)); c.restore();
   }
   function shadow(x,y,w){ c.fillStyle='rgba(0,0,0,.4)'; c.beginPath(); c.ellipse(x,y,w,w*.22,0,0,7); c.fill(); }
   const fmtD=n=>n>=1e6?(n/1e6).toFixed(1)+'M':n>=1e3?(n/1e3).toFixed(1)+'K':String(Math.round(n));

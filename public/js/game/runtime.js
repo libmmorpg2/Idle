@@ -34,4 +34,4 @@ function spawnPack(){
 function front(){ let f=null; for(const e of enemies){ if(!e.dead && (!f||e.x<f.x)) f=e; } return f; }
 function alive(){ return enemies.filter(e=>!e.dead && e.x<WW+10); }
 function enemyY(e){ return MON[e.type].mv==='fly'? GY-30-Math.sin(e.bob*2)*2 : GY; }
-function enemyTop(e){ return enemyY(e)-(e.boss?20:16)*e.scale-(MON[e.type].mv==='float'?3:0); }
+function enemyTop(e){ return enemyY(e)-monSize(e.type).h*e.scale-(MON[e.type].mv==='float'?3:0); }

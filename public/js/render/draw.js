@@ -85,8 +85,8 @@ function draw(){
   for(const r of rains){ const p=r.t/r.dur; const g=ctx.createRadialGradient(r.x,GY,4,r.x,GY,110); g.addColorStop(0,`rgba(180,76,255,${0.25*(1-p)})`); g.addColorStop(1,'rgba(180,76,255,0)'); ctx.fillStyle=g; ctx.fillRect(r.x-110,GY-60,220,80); }
   const list=enemies.slice().sort((a,b)=>b.x-a.x);
   for(const e of list){
-    const mv=MON[e.type].mv, s=Math.max(1,Math.round(e.scale*k))/k, w=16*s, h=(e.boss?20:16)*s, y=enemyY(e), t=e.bob, ph=e.ph||0;
-    const fr=mv==='walk'?Math.floor(t*1.4)%2:0, moving=(e.mov||runV>0)&&!e.dead;
+    const mv=MON[e.type].mv, sz=monSize(e.type), s=Math.max(1,Math.round(e.scale*k))/k, w=sz.w*s, h=sz.h*s, y=enemyY(e), t=e.bob, ph=e.ph||0;
+    const moving=(e.mov||runV>0)&&!e.dead, fr=Math.floor(t*(moving?2.6:1.6)), an=moving?'run':'idle';
     let sx=1, sy=1, by=0, rot=0;
     if(mv==='hop'){ const q=Math.sin(t*1.6); sx+=q*0.09; sy-=q*0.09; by=-Math.max(0,Math.sin(t*1.6))*3.5; }
     else if(mv==='fly'){ const q=Math.sin(t*3.2); sy+=q*0.08; sx-=q*0.03; rot=Math.sin(t*0.9+ph)*0.06; }
@@ -108,8 +108,8 @@ function draw(){
       if(Math.random()<0.25) parts.push({x:e.x+rnd(-14,14),y:y-rnd(0,h),vx:rnd(-5,5),vy:rnd(-30,-12),life:.8,max:.8,col:Math.random()<.5?'#ff5a4a':'#2a0a10',s:1.5,g:0}); }
     ctx.translate(Math.round((e.x+lx)*k)/k,y+by); ctx.rotate(rot); ctx.scale(-1,1); ctx.imageSmoothingEnabled=false;
     const ww=w*sx, hh=h*sy, blink=!e.dead&&e.bl<0;
-    ctx.drawImage(enemySprite(e.type,fr,false,e.boss,blink),-ww/2,-hh,ww,hh);
-    if(e.flash>0){ ctx.globalAlpha*=0.75; ctx.drawImage(enemySprite(e.type,fr,true,e.boss),-ww/2,-hh,ww,hh); }
+    ctx.drawImage(enemySprite(e.type,fr,false,e.boss,blink,an),-ww/2,-hh,ww,hh);
+    if(e.flash>0){ ctx.globalAlpha*=0.75; ctx.drawImage(enemySprite(e.type,fr,true,e.boss,false,an),-ww/2,-hh,ww,hh); }
     ctx.restore();
     if(!e.dead){
       const bw=e.boss?36:18, bx=e.x-bw/2, byy=enemyTop(e)-5;

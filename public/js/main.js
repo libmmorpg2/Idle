@@ -46,7 +46,7 @@ async function boot(){ if(started) return; started=true;
   await login();
   const saved=await fetchSave();
   LOAD.set(88,'Призываем героя…');
-  await new Promise(r=>{ if(imgReady) r(); else { img.addEventListener('load',r); img.addEventListener('error',r); } });
+  await Promise.all([monLoad,new Promise(r=>{ if(imgReady) r(); else { img.addEventListener('load',r); img.addEventListener('error',r); } })]);
   try{ start(Object.assign({},data,{saved})); }catch(e){ showErr(e); }
   LOAD.done();
 }

@@ -20,8 +20,8 @@ function paintBanner(cv,L){
   for(let i=0;i<W;i++){ const y=Math.round(28+Math.sin(i/W*Math.PI*4+L.from)*5+Math.sin(i/W*Math.PI*9)*2); x.fillStyle=th.far; x.fillRect(i,y,1,H-y); x.fillStyle=th.far2; x.fillRect(i,y,1,1); }
   x.fillStyle=th.mid; for(let i=0;i<9;i++){ const px=Math.floor(r()*W), h=8+r()*12; for(let y=0;y<h;y++){ const ww=Math.max(1,Math.round(5*y/h)); x.fillRect(px-(ww>>1),44-h+y,ww,1);} }
   x.fillStyle=th.ground; x.fillRect(0,44,W,H-44); x.fillStyle=th.lip; x.fillRect(0,44,W,2);
-  L.mobs.slice(0,5).forEach((m,i)=>{ x.drawImage(enemySprite(m,0,false,false),10+i*22,30); });
-  x.save(); x.translate(W-26,0); x.scale(-1,1); x.drawImage(enemySprite(L.boss,0,false,true),-16,24); x.restore();
+  L.mobs.slice(0,5).forEach((m,i)=>{ const sp=enemySprite(m,0,false,false); x.drawImage(sp,10+i*22,46-sp.height); });
+  { const b=enemySprite(L.boss,0,false,true), bh=Math.min(b.height,26), bw=b.width*bh/b.height; x.save(); x.translate(W-6,0); x.scale(-1,1); x.drawImage(b,0,46-bh,bw,bh); x.restore(); }
 }
 const DROP_PCT=[0.1,0.001,0.00001,0.000001,0.0000001,0.0000000001]; // % per kill
 const BOSS_MULT=1;
