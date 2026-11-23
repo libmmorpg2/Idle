@@ -31,7 +31,23 @@
 /* Экран загрузки: работает до загрузки остальных скриптов */
 var LOAD=(function(){
   var el=document.getElementById('loader'), fill=document.getElementById('ldFill'), st=document.getElementById('ldStatus'), tip=document.getElementById('ldTip');
-  var t0=Date.now(), cur=0, done=false;
+  /* Загрузка длится 6–8 с: полоска идёт по времени, но не обгоняет реальную загрузку.
+     Пока открыт экран входа через Telegram, отсчёт стоит на паузе. */
+  var D=5000+Math.random()*2000, t0=Date.now(), paused=0, pauseAt=0;
+  var real=0, shown=0, ready=false, done=false;
+  fill.style.transition='none';
+  function elapsed(){ return (pauseAt||Date.now())-t0-paused; }
+  function tick(){
+    if(done) return;
+    var x=Math.min(1,elapsed()/D), timeP=100*(1-Math.pow(1-x,1.35));
+    shown+=(Math.min(real,timeP)-shown)*0.12; fill.style.width=shown.toFixed(2)+'%';
+    if(ready&&x>=1&&shown>99.3){ finish(); return; }
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+  function finish(){ done=true; fill.style.width='100%'; st.textContent='Готово'; st.classList.remove('err');
+    setTimeout(function(){ el.classList.add('out'); clearInterval(tipTimer);
+      setTimeout(function(){ if(typeof SPLASH!=="undefined"&&SPLASH) SPLASH.stop(); el.remove(); },700); },120); }
   var TIPS=['Герой сражается и без тебя — до 8 часов добычи, пока ты офлайн',
     'Зелья дают +20% на 10 минут, а их время складывается до часа',
     'Собери 5 книг умения, чтобы попытаться его изучить',
@@ -43,14 +59,12 @@ var LOAD=(function(){
   function showTip(){ tip.classList.remove('on'); setTimeout(function(){ tip.textContent='Совет: '+TIPS[ti++%TIPS.length]; tip.classList.add('on'); },300); }
   showTip(); var tipTimer=setInterval(showTip,4500);
   return {
-    set:function(p,text){ if(done) return; cur=Math.max(cur,p); fill.style.width=cur+'%'; if(text){ st.textContent=text; st.classList.remove('err'); } },
+    set:function(p,text){ if(done) return; real=Math.max(real,p); if(text){ st.textContent=text; st.classList.remove('err'); } },
     error:function(text){ if(done) return; st.textContent=text; st.classList.add('err'); },
-    login:function(on){ document.getElementById('login').hidden=!on; document.getElementById('ldProgress').hidden=!!on; },
+    login:function(on){ document.getElementById('login').hidden=!on; document.getElementById('ldProgress').hidden=!!on;
+      if(on&&!pauseAt) pauseAt=Date.now(); else if(!on&&pauseAt){ paused+=Date.now()-pauseAt; pauseAt=0; } },
     get open(){ return !done; },
-    done:function(){ if(done) return; this.set(100,'Готово');
-      done=true;
-      setTimeout(function(){ el.classList.add('out'); clearInterval(tipTimer);
-        setTimeout(function(){ if(typeof SPLASH!=='undefined'&&SPLASH) SPLASH.stop(); el.remove(); },700); }, Math.max(350,1800-(Date.now()-t0))); }
+    done:function(){ if(done||ready) return; real=100; ready=true; st.textContent='Готовим поле боя…'; st.classList.remove('err'); }
   };
 })();
 LOAD.set(12);
