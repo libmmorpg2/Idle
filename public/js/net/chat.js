@@ -1,5 +1,6 @@
 // ---- shared chat (artifact db) ----
-const CHAT={db:null,user:null,uid:null,docs:[],mine:[],ro:false,sending:false,seen:+(()=>{try{return localStorage.getItem('chatSeen')||0}catch(e){return 0}})(),state:'off'};
+const CHAT={db:null,user:null,uid:null,docs:[],mine:[],ro:false,sending:false,get seen(){ return (S&&S.chatSeen)||0; }, set seen(v){ if(S) S.chatSeen=v; },   // хранится в сохранении на сервере
+  state:'off'};
 const chatEl=id=>document.getElementById(id);
 function chatMsgs(){ const out=[]; for(const d of CHAT.docs) for(const m of (d.msgs||[])) if(m&&typeof m.t==='string') out.push({uid:d.id,t:m.t.slice(0,140),ts:+m.ts||0,h:m.h,l:m.l}); return out.sort((a,b)=>a.ts-b.ts).slice(-60); }
 async function chatNames(ids){ const r={}; let ps={}; if(CHAT.user&&ids.length){ try{ ps=await CHAT.user.profiles(ids); }catch(e){} } return ps; }
@@ -12,7 +13,7 @@ async function chatRender(){
   if(L){ const n=document.createElement('span'); n.className='cn'; n.style.color=colOf(L,ps); n.textContent=nameOf(L,ps)+':'; const t=document.createElement('span'); t.textContent=L.t; last.append(n,t); }
   else { const t=document.createElement('span'); t.className='cm'; t.textContent=CHAT.state==='off'?'Чат недоступен в этом окне':'Чат пуст — напиши первым'; last.append(t); }
   const open=!chatEl('chatPanel').hidden;
-  if(open && L && L.ts>CHAT.seen){ CHAT.seen=L.ts; try{localStorage.setItem('chatSeen',L.ts)}catch(e){} }
+  if(open && L && L.ts>CHAT.seen){ CHAT.seen=L.ts; save(); }
   chatEl('chatDot').hidden=!(L && L.ts>CHAT.seen && L.uid!==CHAT.uid);
   if(!open) return;
   const list=chatEl('chatList'); const atEnd=list.scrollHeight-list.scrollTop-list.clientHeight<30; list.textContent='';

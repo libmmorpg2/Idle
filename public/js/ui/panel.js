@@ -154,7 +154,6 @@ $('tgAuto').onclick=()=>{S.auto=!S.auto;syncToggles();save();};
 $('tgFast').onclick=()=>{S.fast=!S.fast;syncToggles();save();};
 
 function newGame(){
-  try{ localStorage.removeItem(SAVE_KEY); }catch(e){}
   const keep={auto:S.auto,fast:S.fast};
   S=Object.assign(JSON.parse(JSON.stringify(DEF)),keep); S.inv=null; applyHero(); invInit();
   enemies=[]; arrows=[]; rains=[]; fxs=[]; parts=[]; floats=[]; buff.power=0; buff.guard=0; buff.shield=0; buff.shieldT=0; bossT=0; skCd=[0,0,0,0,0];

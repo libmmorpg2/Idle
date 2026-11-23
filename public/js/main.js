@@ -18,7 +18,8 @@ function loop(now){
     if(saveAcc>5){saveAcc=0;save();}
   }catch(e){ if(errCount++<3){ console.error(e); showErr(e);} }
 }
-document.addEventListener('visibilitychange',()=>{ if(document.hidden) save(); });
+document.addEventListener('visibilitychange',()=>{ if(document.hidden) save(true); });
+window.addEventListener('pagehide',()=>save(true));
 
 
 function sndBtnSync(){}
@@ -38,8 +39,9 @@ function start(data){
 }
 try{ window.claude?.hot?.snapshot?.(()=>({S})); }catch(e){}
 let started=false;
-function boot(){ if(started) return; started=true;
+async function boot(){ if(started) return; started=true;
   let data={}; try{ data=(window.claude&&window.claude.hot&&window.claude.hot.data)||{}; }catch(e){}
-  try{ start(data); }catch(e){ showErr(e); }
+  const saved=await fetchSave();
+  try{ start(Object.assign({},data,{saved})); }catch(e){ showErr(e); }
 }
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot); else boot();

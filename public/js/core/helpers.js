@@ -1,5 +1,4 @@
 let FR=FRS.mage;
-const SAVE_KEY="abyss-mage-v1";
 /* ---------- helpers ---------- */
 const $=id=>document.getElementById(id);
 const rnd=(a,b)=>a+Math.random()*(b-a);

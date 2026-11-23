@@ -4,7 +4,7 @@ let S;
 function loadState(data){
   let s=null;
   if(data && data.S) s=data.S;
-  else { try{ s=JSON.parse(localStorage.getItem(SAVE_KEY)||'null'); }catch(e){} }
+  else if(data && data.saved) s=data.saved;   // сохранение из PostgreSQL (см. boot в main.js)
   S=Object.assign(JSON.parse(JSON.stringify(DEF)),s||{});
   S.upg=Object.assign({},DEF.upg,(s&&s.upg)||{});
   S.sks=Object.assign({mage:[1,1,1,1,1],tank:[1,1,1,1,1],asn:[1,1,1,1,1],sam:[1,1,1,1,1]},(s&&s.sks)||{});
@@ -22,4 +22,32 @@ function loadState(data){
   delete S.sks.gun; delete S.psv.gun; delete S.learn.gun;
   applyHero(); invInit();
 }
-function save(){ S.last=Date.now(); try{ localStorage.setItem(SAVE_KEY,JSON.stringify(S)); }catch(e){} }
+/* ---------- сохранение на сервер (PostgreSQL), в браузере ничего не хранится ---------- */
+const SRV={rev:0,busy:false,dirty:false,dead:false,retry:0,netErr:false};
+function srvMsg(text){ const b=$('err'); if(!b) return; b.hidden=!text; b.textContent=text||''; }
+function save(urgent){ if(!S||SRV.dead) return; S.last=Date.now(); SRV.dirty=true; flushSave(urgent); }
+async function flushSave(urgent){
+  if(SRV.busy||!SRV.dirty||SRV.dead) return;
+  clearTimeout(SRV.retry); SRV.dirty=false; SRV.busy=true;
+  const body=JSON.stringify({state:S,rev:SRV.rev});
+  try{
+    const r=await fetch('api/save',{method:'PUT',headers:{'Content-Type':'application/json'},body,credentials:'same-origin',keepalive:!!urgent&&body.length<60000});
+    if(r.status===409){ SRV.dead=true; srvMsg('Игра открыта в другой вкладке или на другом устройстве. Обновите страницу — здесь прогресс больше не сохраняется.'); return; }
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    SRV.rev=(await r.json()).rev;
+    if(SRV.netErr){ SRV.netErr=false; srvMsg(''); }
+  }catch(e){
+    SRV.dirty=true; SRV.netErr=true; srvMsg('Нет связи с сервером — прогресс не сохранён, повторяю…');
+    SRV.retry=setTimeout(flushSave,3000);
+  }finally{ SRV.busy=false; }
+  if(SRV.dirty&&!SRV.netErr) flushSave();
+}
+async function fetchSave(){   // ждёт сервер, пока не ответит: без загрузки нельзя начинать, иначе затрём прогресс
+  for(;;){
+    try{
+      const r=await fetch('api/save',{cache:'no-store',credentials:'same-origin'});
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      const j=await r.json(); SRV.rev=j.rev|0; srvMsg(''); return j.state;
+    }catch(e){ srvMsg('Не удалось загрузить сохранение с сервера, повторяю…'); await new Promise(f=>setTimeout(f,3000)); }
+  }
+}
