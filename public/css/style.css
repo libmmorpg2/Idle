@@ -531,13 +531,76 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .pk-hint{position:absolute;left:0;right:0;bottom:2px;text-align:center;font-size:11px;color:#7d705f;pointer-events:none}
 .pk-arr{visibility:hidden}
 
-/* ---------- вход через Telegram ---------- */
-.login{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:16px;background:radial-gradient(circle at 50% 30%,#2a1a3c,#0a0710 70%)}
-.login[hidden]{display:none}
-.login-card{max-width:340px;width:100%;padding:24px 20px;text-align:center;border:2px solid var(--trim);border-radius:10px;background:linear-gradient(#1c1525,#130e19);box-shadow:0 10px 40px rgba(0,0,0,.6)}
-.login-card h1{margin:0 0 10px;font:700 26px var(--f-display);color:var(--parch)}
-.login-card p{margin:0 0 18px;font-size:13px;line-height:1.45;color:var(--muted)}
+/* ---------- экран загрузки ---------- */
+.loader{position:fixed;inset:0;z-index:60;overflow:hidden;display:flex;align-items:center;justify-content:center;padding:16px;
+  background:linear-gradient(#07050d 0%,#140c24 45%,#241537 75%,#0b0712 100%);color:var(--fg);transition:opacity .6s ease,visibility .6s}
+.loader.out{opacity:0;visibility:hidden}
+.loader.out .ld-main{transform:scale(1.06);filter:blur(2px)}
+.ld-sky{position:absolute;inset:0;opacity:.9;
+  background-image:radial-gradient(1px 1px at 20px 30px,#fff,transparent),radial-gradient(1px 1px at 120px 80px,#d8c8ff,transparent),
+    radial-gradient(1.5px 1.5px at 60px 140px,#fff,transparent),radial-gradient(1px 1px at 170px 170px,#cfe0ff,transparent),
+    radial-gradient(1px 1px at 90px 10px,#fff,transparent);
+  background-size:200px 200px;animation:ldTwinkle 4s ease-in-out infinite alternate}
+.ld-sky::after{content:"";position:absolute;inset:0;background-image:radial-gradient(1px 1px at 40px 60px,#fff,transparent),radial-gradient(1px 1px at 230px 20px,#e8d8ff,transparent),radial-gradient(1.5px 1.5px at 150px 250px,#fff,transparent);
+  background-size:300px 300px;animation:ldTwinkle 3s ease-in-out -1.5s infinite alternate}
+.ld-moon{position:absolute;top:9%;right:14%;width:84px;height:84px;border-radius:50%;
+  background:radial-gradient(circle at 38% 36%,#fff6e6,#e8dcc8 45%,#b9a9c9 100%);
+  box-shadow:0 0 40px 10px rgba(230,215,255,.25),0 0 120px 40px rgba(180,92,255,.18)}
+.ld-moon::after{content:"";position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 62% 60%,rgba(120,100,140,.35) 0 9%,transparent 10%),radial-gradient(circle at 35% 70%,rgba(120,100,140,.3) 0 6%,transparent 7%),radial-gradient(circle at 55% 30%,rgba(120,100,140,.25) 0 5%,transparent 6%)}
+.ld-mnt{position:absolute;left:-5%;right:-5%;bottom:0}
+.ld-mnt1{height:42%;background:#1a1029;clip-path:polygon(0 60%,8% 42%,15% 55%,24% 28%,33% 50%,41% 36%,50% 58%,60% 22%,70% 48%,78% 34%,88% 54%,95% 40%,100% 50%,100% 100%,0 100%)}
+.ld-mnt2{height:30%;background:#0d0817;clip-path:polygon(0 55%,6% 40%,12% 62%,20% 30%,26% 50%,34% 44%,42% 66%,52% 36%,60% 58%,68% 42%,76% 64%,84% 30%,92% 56%,100% 38%,100% 100%,0 100%)}
+.ld-fog{position:absolute;left:-50%;right:-50%;bottom:6%;height:28%;opacity:.5;
+  background:radial-gradient(ellipse at 30% 60%,rgba(150,110,210,.35),transparent 60%),radial-gradient(ellipse at 70% 50%,rgba(120,90,190,.3),transparent 60%);
+  animation:ldFog 14s ease-in-out infinite alternate}
+.ld-embers i{position:absolute;bottom:-10px;width:3px;height:3px;background:#d79bff;box-shadow:0 0 6px 2px rgba(196,107,255,.7);opacity:0;animation:ldEmber 7s linear infinite}
+.ld-embers i:nth-child(1){left:8%;animation-delay:0s}.ld-embers i:nth-child(2){left:17%;animation-delay:2.1s;animation-duration:9s}
+.ld-embers i:nth-child(3){left:26%;animation-delay:4.3s}.ld-embers i:nth-child(4){left:35%;animation-delay:1.2s;animation-duration:8s;background:#ffd27a;box-shadow:0 0 6px 2px rgba(255,190,90,.6)}
+.ld-embers i:nth-child(5){left:44%;animation-delay:5.5s}.ld-embers i:nth-child(6){left:52%;animation-delay:3.1s;animation-duration:10s}
+.ld-embers i:nth-child(7){left:61%;animation-delay:.6s}.ld-embers i:nth-child(8){left:69%;animation-delay:4.8s;animation-duration:8.5s;background:#ffd27a;box-shadow:0 0 6px 2px rgba(255,190,90,.6)}
+.ld-embers i:nth-child(9){left:77%;animation-delay:2.7s}.ld-embers i:nth-child(10){left:85%;animation-delay:6.2s;animation-duration:9.5s}
+.ld-embers i:nth-child(11){left:92%;animation-delay:1.7s}.ld-embers i:nth-child(12){left:4%;animation-delay:3.9s;animation-duration:11s}
+.ld-main{position:relative;width:100%;max-width:360px;display:flex;flex-direction:column;align-items:center;text-align:center;transition:transform .6s ease,filter .6s ease}
+.ld-sigil{position:relative;width:min(210px,52vw);aspect-ratio:1;margin-bottom:14px}
+.ld-sigil svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;filter:drop-shadow(0 0 6px rgba(196,107,255,.55))}
+.ld-ring{fill:none;stroke:#b07ae8;stroke-width:1.5}.ld-ring.thin{stroke:#e6c98a;stroke-width:2}
+.ld-tri{fill:none;stroke:#c9a25a;stroke-width:1.2;opacity:.8}
+.ld-runes{fill:#e6c98a;font-size:13px;letter-spacing:2px}
+.ld-r1,.ld-r2,.ld-r3{transform-origin:100px 100px}
+.ld-r1{animation:ldSpin 40s linear infinite}.ld-r2{animation:ldSpin 26s linear infinite reverse}.ld-r3{animation:ldSpin 18s linear infinite}
+.ld-orb{position:absolute;inset:34%;border-radius:50%;
+  background:radial-gradient(circle at 40% 35%,#fbeaff 0%,#d79bff 18%,#8a3dff 45%,#3a1470 75%,#14082a 100%);
+  box-shadow:0 0 24px 6px rgba(160,80,255,.6),0 0 70px 20px rgba(120,50,220,.35),inset 0 0 18px rgba(0,0,0,.6);animation:ldPulse 2.4s ease-in-out infinite}
+.ld-orb span{position:absolute;inset:18%;border-radius:50%;background:conic-gradient(from 0deg,transparent,rgba(255,255,255,.55),transparent 30%,transparent 50%,rgba(230,190,255,.45),transparent 80%);mix-blend-mode:screen;animation:ldSpin 3s linear infinite}
+.ld-title{margin:0;font:700 clamp(34px,10vw,46px)/1 var(--f-display);letter-spacing:.02em;
+  background:linear-gradient(#fff3d0 10%,#f0d9a8 45%,#c9a25a 70%,#8a6230);-webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 2px 0 #000) drop-shadow(0 0 14px rgba(201,162,90,.35))}
+.ld-sub{margin-top:6px;font:600 11px var(--f-display);letter-spacing:.5em;text-transform:uppercase;color:#a98fd0;padding-left:.5em}
+.ld-progress{box-sizing:border-box;width:100%;padding:0 6px;margin-top:28px}
+.ld-progress[hidden],.ld-login[hidden]{display:none}
+.ld-bar{position:relative;height:12px;padding:2px;border:1px solid #7a5c34;border-radius:7px;background:#0d0817;box-shadow:inset 0 2px 4px rgba(0,0,0,.7),0 0 0 1px #000}
+.ld-bar::before,.ld-bar::after{content:"";position:absolute;top:50%;width:8px;height:8px;background:#c9a25a;border:1px solid #000;transform:translateY(-50%) rotate(45deg)}
+.ld-bar::before{left:-6px}.ld-bar::after{right:-6px}
+.ld-bar i{display:block;height:100%;width:0;border-radius:5px;position:relative;overflow:hidden;
+  background:linear-gradient(90deg,#5a22a8,#a65cff 70%,#e3b8ff);box-shadow:0 0 10px rgba(166,92,255,.7);transition:width .6s cubic-bezier(.2,.8,.2,1)}
+.ld-bar i::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 20%,rgba(255,255,255,.5) 50%,transparent 80%);background-size:200% 100%;animation:ldShine 1.4s linear infinite}
+.ld-status{margin-top:10px;min-height:1.3em;font:600 13px var(--f-display);color:#d8c8ea;letter-spacing:.03em}
+.ld-status.err{color:#ffb0a0}
+.ld-login{box-sizing:border-box;width:100%;margin-top:24px;padding:16px;border:1px solid #7a5c34;border-radius:8px;background:rgba(19,14,25,.82);box-shadow:0 8px 30px rgba(0,0,0,.5);animation:ldIn .5s ease both}
+.ld-login p{margin:0 0 14px;font-size:13px;line-height:1.45;color:var(--muted)}
 .login-btn{min-height:44px;display:flex;justify-content:center}
-.login-card small{display:block;margin-top:12px;font-size:12px;color:#ffb0a0;min-height:1em}
+.ld-login small{display:block;margin-top:10px;font-size:12px;color:#ffb0a0;min-height:1em}
+.ld-tip{margin-top:22px;max-width:300px;min-height:2.8em;font-size:12px;line-height:1.4;color:#9d8db3;opacity:0;transform:translateY(4px);transition:opacity .3s,transform .3s}
+.ld-tip.on{opacity:1;transform:none}
+@keyframes ldSpin{to{transform:rotate(360deg)}}
+@keyframes ldPulse{0%,100%{transform:scale(1);filter:brightness(1)}50%{transform:scale(1.06);filter:brightness(1.2)}}
+@keyframes ldTwinkle{from{opacity:.45}to{opacity:1}}
+@keyframes ldFog{from{transform:translateX(-6%)}to{transform:translateX(6%)}}
+@keyframes ldEmber{0%{transform:translate(0,0);opacity:0}10%{opacity:1}100%{transform:translate(30px,-90vh);opacity:0}}
+@keyframes ldShine{from{background-position:150% 0}to{background-position:-50% 0}}
+@keyframes ldIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.loader *,.loader *::before,.loader *::after{animation:none!important}}
+
+/* ---------- профиль: аккаунт ---------- */
 .acct{margin-top:22px;display:flex;flex-direction:column;gap:10px}
 .acct .note b{color:var(--parch)}

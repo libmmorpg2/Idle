@@ -43,6 +43,9 @@ async function boot(){ if(started) return; started=true;
   let data={}; try{ data=(window.claude&&window.claude.hot&&window.claude.hot.data)||{}; }catch(e){}
   await login();
   const saved=await fetchSave();
+  LOAD.set(88,'Призываем героя…');
+  await new Promise(r=>{ if(imgReady) r(); else { img.addEventListener('load',r); img.addEventListener('error',r); } });
   try{ start(Object.assign({},data,{saved})); }catch(e){ showErr(e); }
+  LOAD.done();
 }
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot); else boot();

@@ -24,7 +24,7 @@ function loadState(data){
 }
 /* ---------- сохранение на сервер (PostgreSQL), в браузере ничего не хранится ---------- */
 const SRV={rev:0,busy:false,dirty:false,dead:false,retry:0,netErr:false};
-function srvMsg(text){ const b=$('err'); if(!b) return; b.hidden=!text; b.textContent=text||''; }
+function srvMsg(text){ if(LOAD.open){ if(text) LOAD.error(text); return; } const b=$('err'); if(!b) return; b.hidden=!text; b.textContent=text||''; }
 function save(urgent){ if(!S||SRV.dead) return; S.last=Date.now(); SRV.dirty=true; flushSave(urgent); }
 async function flushSave(urgent){
   if(SRV.busy||!SRV.dirty||SRV.dead) return;
@@ -46,6 +46,7 @@ async function flushSave(urgent){
 async function fetchSave(){   // ждёт сервер, пока не ответит: без загрузки нельзя начинать, иначе затрём прогресс
   for(;;){
     try{
+      LOAD.set(70,'Загружаем сохранение…');
       const r=await api('save');
       if(r.status===401){ location.reload(); await new Promise(()=>{}); }
       if(!r.ok) throw new Error('HTTP '+r.status);

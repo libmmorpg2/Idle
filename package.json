@@ -1,7 +1,7 @@
 {
-  "name": "blade-idle",
+  "name": "rampage-idlerpg",
   "private": true,
-  "description": "Маг Бездны — idle-RPG; сохранения в PostgreSQL",
+  "description": "Rampage: idle rpg; сохранения в PostgreSQL",
   "main": "server/index.js",
   "scripts": {
     "start": "node server/index.js"

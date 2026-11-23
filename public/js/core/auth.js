@@ -14,6 +14,7 @@ async function tgAuth(body){
   const j=await r.json(); AUTH.token=j.token; AUTH.user=j.user; return j.user;
 }
 async function login(){
+  LOAD.set(45,'Вход через Telegram…');
   if(TG){
     try{ TG.ready(); TG.expand(); }catch(e){}
     for(;;){ try{ const u=await tgAuth({initData:TG.initData}); srvMsg(''); return u; }
@@ -23,11 +24,11 @@ async function login(){
   return showLogin();
 }
 function showLogin(){ return new Promise(async done=>{
-  const box=$('login'), msg=$('loginMsg'); box.hidden=false;
+  const msg=$('loginMsg'); LOAD.login(true);
   let cfg={}; try{ cfg=await (await api('config')).json(); }catch(e){ msg.textContent='Нет связи с сервером. Обновите страницу.'; return; }
   if(!cfg.botUsername){ msg.textContent='Вход не настроен: на сервере не задан BOT_USERNAME.'; return; }
   window.onTelegramAuth=async u=>{
-    try{ msg.textContent='Входим…'; const user=await tgAuth({widget:u}); box.hidden=true; done(user); }
+    try{ msg.textContent='Входим…'; const user=await tgAuth({widget:u}); LOAD.login(false); LOAD.set(60,'С возвращением!'); done(user); }
     catch(e){ msg.textContent='Ошибка входа: '+e.message; }
   };
   const s=document.createElement('script'); s.async=true; s.src='https://telegram.org/js/telegram-widget.js?22';

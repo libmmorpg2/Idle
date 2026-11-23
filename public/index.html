@@ -3,13 +3,72 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Маг Бездны</title>
+<title>Rampage: idle rpg</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Philosopher:wght@400;700&family=Exo+2:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="css/style.css">
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
+<div class="loader" id="loader" role="status" aria-live="polite">
+  <div class="ld-sky"></div>
+  <div class="ld-moon"></div>
+  <div class="ld-mnt ld-mnt1"></div>
+  <div class="ld-mnt ld-mnt2"></div>
+  <div class="ld-fog"></div>
+  <div class="ld-embers" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  <div class="ld-main">
+    <div class="ld-sigil" aria-hidden="true">
+      <svg viewBox="0 0 200 200">
+        <defs>
+          <path id="ldRuneTxt" d="M100,100 m-78,0 a78,78 0 1,1 156,0 a78,78 0 1,1 -156,0"/>
+        </defs>
+        <g class="ld-r1"><circle cx="100" cy="100" r="92" class="ld-ring"/><circle cx="100" cy="100" r="86" class="ld-ring thin" stroke-dasharray="2 6"/></g>
+        <g class="ld-r2"><text class="ld-runes"><textPath href="#ldRuneTxt">ᚠ ᚢ ᚦ ᚨ ᚱ ᚲ ᚷ ᚹ ᚺ ᚾ ᛁ ᛃ ᛇ ᛈ ᛉ ᛊ ᛏ ᛒ ᛖ ᛗ ᛚ ᛜ ᛞ ᛟ ᚠ ᚢ ᚦ ᚨ</textPath></text></g>
+        <g class="ld-r3"><circle cx="100" cy="100" r="64" class="ld-ring"/>
+          <polygon points="100,38 154,131 46,131" class="ld-tri"/><polygon points="100,162 46,69 154,69" class="ld-tri"/></g>
+      </svg>
+      <div class="ld-orb"><span></span></div>
+    </div>
+    <h1 class="ld-title">Rampage</h1>
+    <div class="ld-sub">idle rpg</div>
+    <div class="ld-progress" id="ldProgress">
+      <div class="ld-bar"><i id="ldFill"></i></div>
+      <div class="ld-status" id="ldStatus">Открываем врата…</div>
+    </div>
+    <div class="ld-login" id="login" hidden>
+      <p>Войдите через Telegram — прогресс будет храниться на сервере и откроется с любого устройства.</p>
+      <div id="loginBtn" class="login-btn"></div>
+      <small id="loginMsg"></small>
+    </div>
+    <div class="ld-tip" id="ldTip"></div>
+  </div>
+</div>
+<script>
+/* Экран загрузки: работает до загрузки остальных скриптов */
+var LOAD=(function(){
+  var el=document.getElementById('loader'), fill=document.getElementById('ldFill'), st=document.getElementById('ldStatus'), tip=document.getElementById('ldTip');
+  var t0=Date.now(), cur=0, done=false;
+  var TIPS=['Герой сражается и без тебя — до 8 часов добычи, пока ты офлайн',
+    'Зелья дают +20% на 10 минут, а их время складывается до часа',
+    'Собери 5 книг умения, чтобы попытаться его изучить',
+    'Заточка поднимает вещь вплоть до +9 — но не всегда удачно',
+    'Питомцы и плащи дают постоянные бонусы герою',
+    'Кнопка x2 ускоряет бой вдвое',
+    'В сумке помещается 200 предметов — не забывай продавать лишнее'];
+  var ti=Math.floor(Math.random()*TIPS.length);
+  function showTip(){ tip.classList.remove('on'); setTimeout(function(){ tip.textContent='Совет: '+TIPS[ti++%TIPS.length]; tip.classList.add('on'); },300); }
+  showTip(); var tipTimer=setInterval(showTip,4500);
+  return {
+    set:function(p,text){ if(done) return; cur=Math.max(cur,p); fill.style.width=cur+'%'; if(text){ st.textContent=text; st.classList.remove('err'); } },
+    error:function(text){ if(done) return; st.textContent=text; st.classList.add('err'); },
+    login:function(on){ document.getElementById('login').hidden=!on; document.getElementById('ldProgress').hidden=!!on; },
+    get open(){ return !done; },
+    done:function(){ if(done) return; this.set(100,'Готово'); done=true;
+      setTimeout(function(){ el.classList.add('out'); clearInterval(tipTimer); setTimeout(function(){ el.remove(); },700); }, Math.max(350,1100-(Date.now()-t0))); }
+  };
+})();
+LOAD.set(12);
+</script>
 
 <div id="app">
   <div id="stage">
@@ -69,14 +128,6 @@
     <button class="tab" data-tab="map" id="tab-map"><span class="nb"><img data-na="map" alt=""></span><span class="tl">Локации</span></button>
     <button class="tab" data-tab="profile" id="tab-profile"><span class="nb"><img data-na="profile" alt=""></span><span class="tl">Профиль</span></button>
   </nav>
-    <div class="login" id="login" hidden>
-      <div class="login-card">
-        <h1>Маг Бездны</h1>
-        <p>Войдите через Telegram, чтобы прогресс сохранялся на сервере и был доступен с любого устройства.</p>
-        <div id="loginBtn" class="login-btn"></div>
-        <small id="loginMsg"></small>
-      </div>
-    </div>
     <div class="picker" id="picker" hidden role="dialog" aria-label="Выбор героя">
       <canvas id="pkBg" class="pk-bg"></canvas>
       <button class="pk-x" id="pkClose" aria-label="Закрыть">✕</button>
@@ -86,6 +137,8 @@
     </div>
 </div>
 
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script>LOAD.set(25,'Загружаем мир…')</script>
 <script src="js/data/assets.js"></script>
 <script src="js/data/frames.js"></script>
 <script src="js/core/helpers.js"></script>
