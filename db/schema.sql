@@ -69,3 +69,40 @@ CREATE TABLE IF NOT EXISTS referral_rewards (
   claimed_at timestamptz,
   UNIQUE (tg_id, reason, ref_id)
 );
+
+-- GRAM: премиальная валюта, хранится только на сервере.
+ALTER TABLE players ADD COLUMN IF NOT EXISTS gram bigint NOT NULL DEFAULT 0;
+-- Журнал всех изменений баланса GRAM.
+CREATE TABLE IF NOT EXISTS gram_tx (
+  id         bigserial   PRIMARY KEY,
+  tg_id      bigint      NOT NULL REFERENCES players (tg_id) ON DELETE CASCADE,
+  amount     bigint      NOT NULL,          -- + пополнение, − покупка
+  reason     text        NOT NULL,          -- topup:<order> | buy:<item> | admin
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS gram_tx_player ON gram_tx (tg_id, id DESC);
+-- Заказы на пополнение за TON: игрок переводит amount_nano на кошелёк игры с комментарием comment.
+CREATE TABLE IF NOT EXISTS gram_orders (
+  id          bigserial   PRIMARY KEY,
+  tg_id       bigint      NOT NULL REFERENCES players (tg_id) ON DELETE CASCADE,
+  package     text        NOT NULL,
+  amount_nano numeric     NOT NULL,
+  gram        bigint      NOT NULL,
+  comment     text        NOT NULL UNIQUE,
+  status      text        NOT NULL DEFAULT 'pending',   -- pending | paid
+  tx_hash     text        UNIQUE,
+  created_at  timestamptz NOT NULL DEFAULT now(),
+  paid_at     timestamptz
+);
+CREATE INDEX IF NOT EXISTS gram_orders_pending ON gram_orders (created_at) WHERE status = 'pending';
+-- Покупки в магазине; granted — игра уже выдала покупку и сохранилась (иначе выдаст при следующем входе).
+CREATE TABLE IF NOT EXISTS shop_purchases (
+  id         bigserial   PRIMARY KEY,
+  tg_id      bigint      NOT NULL REFERENCES players (tg_id) ON DELETE CASCADE,
+  item       text        NOT NULL,
+  price      bigint      NOT NULL,
+  granted    boolean     NOT NULL DEFAULT false,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS shop_purchases_player ON shop_purchases (tg_id, item);
+CREATE UNIQUE INDEX IF NOT EXISTS shop_purchases_once ON shop_purchases (tg_id, item) WHERE item = 'pack:starter';

@@ -8,6 +8,7 @@ const { verifyWebApp, verifyWidget } = require('./telegram');
 const chatRouter = require('./chat');
 const referralsModule = require('./referrals');
 const botModule = require('./bot');
+const gramModule = require('./gram');
 
 const env = process.env;
 const PORT = +env.PORT || 3000;
@@ -65,6 +66,12 @@ function auth(req, res, next) {
 }
 
 const referrals = referralsModule(pool, { links: refLink });
+const gram = gramModule(pool, {
+  receiver: env.TON_RECEIVER || '',                       // кошелёк игры для приёма TON
+  rate: Number(env.GRAM_PER_TON) || 100,                  // сколько GRAM за 1 TON
+  toncenter: (env.TONCENTER_URL || 'https://toncenter.com/api/v2').replace(/\/$/, ''),
+  apiKey: env.TONCENTER_API_KEY || '',
+});
 const bot = botModule({ token: BOT_TOKEN, publicUrl: PUBLIC_URL, apiBase: env.TELEGRAM_API_URL || 'https://api.telegram.org', referrals, links: refLink });
 
 /* ---------- приложение ---------- */
@@ -154,6 +161,7 @@ api.put('/save', auth, async (req, res, next) => {
 
 api.use('/chat', chatRouter(pool, auth));
 api.use('/friends', auth, referrals.router);
+api.use('/gram', auth, gram.router);
 app.use('/api', api);
 app.use('/tg/webhook', bot.router);
 app.use(express.static(path.join(__dirname, '..', 'public')));

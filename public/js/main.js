@@ -24,7 +24,7 @@ window.addEventListener('pagehide',()=>save(true));
 
 function sndBtnSync(){}
 $('shopBtn').addEventListener('click',e=>{ e.stopPropagation(); S.tab='shop'; $('list').scrollTop=0; setSheet(true); });
-document.addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b||b.disabled||b.closest('.buy,[data-potbuy],[data-potdrink],.sk')) return; SND.play('click'); },true);
+document.addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b||b.disabled||b.closest('.buy,[data-gbuy],[data-potdrink],.sk')) return; SND.play('click'); },true);
 
 function start(data){
   STONE_ICON=pixIcon(STONE_MAP,'#3a8aff','#7af0ff').replace(/^/,''); $('stoneIco').src=STONE_ICON;
@@ -37,7 +37,7 @@ function start(data){
   if(!S.picked) openPicker(true);
   if(typeof sndBtnSync==='function') sndBtnSync(); if(typeof SND!=='undefined') SND.apply();
   last=performance.now(); requestAnimationFrame(loop);
-  chatStart(); friendsLoad();
+  chatStart(); friendsLoad(); gramHud(); gramLoad();
 }
 try{ window.claude?.hot?.snapshot?.(()=>({S})); }catch(e){}
 let started=false;

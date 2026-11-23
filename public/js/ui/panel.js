@@ -105,10 +105,10 @@ $('list').addEventListener('click',ev=>{
   const zl=ev.target.closest('[data-zloot]'); if(zl){ openZoneLoot(+zl.dataset.zloot); return; }
   if(ev.target.closest('#stayTog')){ S.stay=!S.stay; save(); renderPanel(); return; }
   const sh=ev.target.closest('[data-shop]'); if(sh){ shopTab=sh.dataset.shop; renderPanel(); return; }
-  const pb=ev.target.closest('[data-potbuy]'); if(pb){ potBuy(pb.dataset.potbuy); return; }
+  const gb=ev.target.closest('[data-gbuy]'); if(gb){ if(!gb.disabled) gramBuy(gb.dataset.gbuy); return; }
+  if(ev.target.closest('[data-gtopup]')){ gramTopupModal(); return; }
   const pd=ev.target.closest('[data-potdrink]'); if(pd){ potDrink(pd.dataset.potdrink); return; }
   const chip=ev.target.closest('.chip[data-f]'); if(chip){ bagFilter=chip.dataset.f; renderPanel(); return; }
-  const by=ev.target.closest('[data-buy]'); if(by){ if(!by.disabled){ const [k,i]=by.dataset.buy.split(':'); buyThing(k,i); } return; }
   const ow=ev.target.closest('[data-own]'); if(ow){ const [k,i]=ow.dataset.own.split(':'); ownModal(k,i); return; }
   const stb=ev.target.closest('.item.stack'); if(stb){ openStack(stb.dataset.st); return; }
   const itb=ev.target.closest('.item'); if(itb){ const it=S.inv.bag.find(x=>x.id==itb.dataset.it); if(it) openItem(it,false); return; }
