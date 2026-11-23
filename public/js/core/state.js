@@ -25,7 +25,8 @@ function loadState(data){
 /* ---------- сохранение на сервер (PostgreSQL), в браузере ничего не хранится ---------- */
 const SRV={rev:0,busy:false,dirty:false,dead:false,retry:0,netErr:false};
 function srvMsg(text){ if(LOAD.open){ if(text) LOAD.error(text); return; } const b=$('err'); if(!b) return; b.hidden=!text; b.textContent=text||''; }
-function save(urgent){ if(!S||SRV.dead) return; S.last=Date.now(); SRV.dirty=true; flushSave(urgent); }
+function save(urgent){ if(!S||SRV.dead) return; S.last=Date.now(); try{ S.bm=calcBM(); }catch(e){}   // БМ видят другие игроки в «Инфо»
+  SRV.dirty=true; flushSave(urgent); }
 async function flushSave(urgent){
   if(SRV.busy||!SRV.dirty||SRV.dead) return;
   clearTimeout(SRV.retry); SRV.dirty=false; SRV.busy=true;

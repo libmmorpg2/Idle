@@ -42,4 +42,5 @@ async function logout(){
   SRV.dead=true; try{ await api('logout',{method:'POST'}); }catch(e){}
   location.reload();
 }
+const displayName=()=>{ const u=AUTH.user; return u?(u.firstName||(u.username?'@'+u.username:'Игрок')):''; };
 const userName=()=>{ const u=AUTH.user; return u?(u.username?'@'+u.username:(u.firstName||'id '+u.id)):''; };

@@ -63,7 +63,7 @@ npm start                   # http://localhost:3000
 | GET   | `/api/chat?after=id` | новые сообщения чата (без `after` — последние 50) |
 | POST  | `/api/chat`          | `{ text, hero, lvl, to?, replyTo? }` → `{ message }`; `to` — личное сообщение; `429` — слишком часто (1 раз в 1,5 с, до 15 в минуту); `403` — получатель вас заблокировал |
 | POST  | `/api/chat/block`    | `{ id, block }` — заблокировать / разблокировать игрока |
-| GET   | `/api/chat/player/:id` | карточка игрока: имя, герой, уровень, рекорд, даты |
+| GET   | `/api/chat/player/:id` | карточка игрока: имя, герой, уровень, БМ, экипировка, рекорд, даты |
 
 Авторизация: `Authorization: Bearer <token>` или кука `sid`.
 

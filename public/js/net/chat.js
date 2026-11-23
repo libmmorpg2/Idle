@@ -122,6 +122,13 @@ async function chatBlock(uid,block){
     chatNote(block?'игрок заблокирован':'игрок разблокирован');
   }catch(e){ chatNote('не получилось'); }
 }
+function piEquip(p){   // экипировка текущего героя игрока: 10 ячеек, по нажатию — название и характеристики
+  const n=Object.keys(p.eq||{}).length;
+  const cell=s=>{ const it=p.eq[s]; return it?`<button type="button" class="slot r${it.rar}" data-s="${s}" aria-label="${SLOT_RU[s]}"><img src="${itemIcon(it.cls,s,it.rar)}" alt=""><i class="lv">${it.lvl}</i>${it.en?`<i class="enb">+${it.en}</i>`:''}</button>`
+    :`<span class="slot ghost" aria-label="${SLOT_RU[s]}"><img src="${itemIcon(p.hero,s,0)}" alt=""></span>`; };
+  return `<div class="pi-sec">Экипировка <small>${n}/${SLOTS.length}</small></div><div class="pi-eq">${[...LEFT_SLOTS,...RIGHT_SLOTS].map(cell).join('')}</div>
+    <div class="pi-it">${n?'<small>Нажми на предмет, чтобы посмотреть</small>':'<small>Ничего не надето</small>'}</div>`;
+}
 async function chatInfo(uid){
   const md=$('modal'); md.innerHTML='<div class="card pinfo"><p>Загрузка…</p></div>'; md.hidden=false;
   let p; try{ const r=await api('chat/player/'+uid); if(!r.ok) throw 0; p=await r.json(); }
@@ -131,11 +138,16 @@ async function chatInfo(uid){
   const pic=p.photo?`<img class="pi-ph" src="${esc(p.photo)}" alt="" referrerpolicy="no-referrer">`:H?`<img class="pi-ph px" src="${PORTS[p.hero]}" alt="">`:'';
   md.innerHTML=`<div class="card pinfo">${pic}<h2 style="color:${colOf(p.id)}">${esc(p.name)}</h2>
     ${p.username?`<a class="pi-un" href="https://t.me/${encodeURIComponent(p.username)}" target="_blank" rel="noopener">@${esc(p.username)}</a>`:''}
-    <dl>${H?`<dt>Герой</dt><dd>${esc(H.name)}</dd>`:''}${p.lvl?`<dt>Уровень</dt><dd>${p.lvl}</dd>`:''}${p.best?`<dt>Рекорд</dt><dd>зона ${p.best}</dd>`:''}
+    <dl>${p.bm?`<dt>Боевая мощь</dt><dd class="pi-bm">${fmt(p.bm)}</dd>`:''}${H?`<dt>Герой</dt><dd>${esc(H.name)}</dd>`:''}${p.lvl?`<dt>Уровень</dt><dd>${p.lvl}</dd>`:''}${p.best?`<dt>Рекорд</dt><dd>зона ${p.best}</dd>`:''}
     <dt>Был в игре</dt><dd>${ago(p.seen)}</dd><dt>Играет с</dt><dd>${date(p.since)}</dd><dt>Сообщений в чате</dt><dd>${p.msgs}</dd></dl>
+    ${H?piEquip(p):''}
     ${p.me?'':`<div class="pi-btns"><button id="piDm">✉ Написать</button><button id="piBlock" class="sec-btn">${p.blocked?'Разблокировать':'⛔ Заблокировать'}</button></div>`}
     <button id="piClose" class="sec-btn">Закрыть</button></div>`;
   const close=()=>{ md.hidden=true; };
+  const eqBox=md.querySelector('.pi-eq');
+  if(eqBox) eqBox.onclick=e=>{ const b=e.target.closest('.slot[data-s]'); if(!b) return; const it=p.eq[b.dataset.s];
+    eqBox.querySelectorAll('.slot').forEach(x=>x.classList.toggle('sel',x===b));
+    md.querySelector('.pi-it').innerHTML=`<b style="color:${RAR[it.rar].col}">${esc(itemName(it))}</b><small>${RAR[it.rar].name}, ур. ${it.lvl} · ${SLOT_RU[it.slot]}</small><ul>${statLines(effSt(it))}</ul>`; };
   $('piClose').onclick=close; md.onclick=e=>{ if(e.target===md){ close(); md.onclick=null; } };
   if(!p.me){
     $('piDm').disabled=p.blocked; $('piDm').onclick=()=>{ close(); chatDm(p.id,p.name.split(' ')[0]); };

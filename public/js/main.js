@@ -30,6 +30,7 @@ function start(data){
   STONE_ICON=pixIcon(STONE_MAP,'#3a8aff','#7af0ff').replace(/^/,''); $('stoneIco').src=STONE_ICON;
   loadState(data);
   $('pic').style.backgroundImage=`url(${HUDP[S.hero]})`;
+  $('hname').textContent=displayName(); $('hname').hidden=!displayName();
   hero.hp=st.maxHp();
   resize(); syncToggles(); buildSkillButtons(); setSheet(false);
   if(!(data&&data.S) && S.last) offlineReward((Date.now()-S.last)/1000);

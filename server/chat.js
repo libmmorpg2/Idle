@@ -8,6 +8,22 @@ const KEEP = 2000;          // сколько сообщений храним (�
 const MIN_GAP_MS = 1500;    // не чаще одного сообщения в 1,5 с
 const PER_MIN = 15;         // и не больше 15 в минуту
 const HEROES = new Set(['mage', 'tank', 'asn', 'sam']);
+const SLOTS = ['weapon', 'helm', 'armor', 'gloves', 'belt', 'pants', 'boots', 'cloak', 'amulet', 'ring'];
+const STATS = ['dmg', 'hp', 'spd', 'crit', 'gold'];
+const smallInt = (v, max) => (Number.isInteger(v) && v >= 0 && v <= max ? v : null);
+// Экипировка из сохранения: только известные поля и значения (данные пишет клиент — не доверяем)
+function cleanEq(eq) {
+  if (!eq || typeof eq !== 'object') return {};
+  const out = {};
+  for (const slot of SLOTS) {
+    const it = eq[slot];
+    if (!it || typeof it !== 'object' || !HEROES.has(it.cls) || smallInt(it.rar, 5) == null) continue;
+    const st = {};
+    for (const k of STATS) { const v = it.st && it.st[k]; if (Number.isFinite(v) && v >= 0 && v < 1e9) st[k] = Math.round(v); }
+    out[slot] = { cls: it.cls, slot, rar: it.rar, lvl: smallInt(it.lvl, 1e6) || 1, en: smallInt(it.en, 9) || 0, st };
+  }
+  return out;
+}
 
 module.exports = function chatRouter(pool, auth) {
   const r = express.Router();
@@ -101,7 +117,8 @@ module.exports = function chatRouter(pool, auth) {
       if (!isId(req.params.id)) return res.status(400).json({ error: 'bad id' });
       const { rows } = await pool.query(
         `SELECT p.tg_id, p.username, p.photo_url, p.created_at, ${NAME('p')} AS name, p.last_name,
-           s.state->>'hero' AS hero, s.state->>'lvl' AS lvl, s.state->>'best' AS best, s.updated_at,
+           s.state->>'hero' AS hero, s.state->>'lvl' AS lvl, s.state->>'best' AS best, s.state->>'bm' AS bm, s.updated_at,
+           s.state->'inv'->'eq'->(s.state->>'hero') AS eq,
            (SELECT count(*) FROM chat_messages WHERE tg_id = p.tg_id AND to_tg_id IS NULL) AS msgs,
            EXISTS (SELECT 1 FROM chat_blocks WHERE tg_id = $2 AND blocked_id = p.tg_id) AS blocked
          FROM players p LEFT JOIN player_saves s ON s.tg_id = p.tg_id WHERE p.tg_id = $1`, [req.params.id, req.tgId]);
@@ -111,7 +128,7 @@ module.exports = function chatRouter(pool, auth) {
       res.json({
         id: Number(p.tg_id), name: p.name + (p.last_name ? ' ' + p.last_name : ''), username: p.username,
         photo: /^https:\/\//.test(p.photo_url || '') ? p.photo_url : null,
-        hero: HEROES.has(p.hero) ? p.hero : null, lvl: int(p.lvl), best: int(p.best),
+        hero: HEROES.has(p.hero) ? p.hero : null, lvl: int(p.lvl), best: int(p.best), bm: int(p.bm), eq: cleanEq(p.eq),
         since: new Date(p.created_at).getTime(), seen: p.updated_at ? new Date(p.updated_at).getTime() : null,
         msgs: Number(p.msgs), blocked: p.blocked, me: String(p.tg_id) === String(req.tgId),
       });

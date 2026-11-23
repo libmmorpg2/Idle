@@ -604,3 +604,20 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 /* ---------- профиль: аккаунт ---------- */
 .acct{margin-top:22px;display:flex;flex-direction:column;gap:10px}
 .acct .note b{color:var(--parch)}
+
+/* ---------- карточка игрока: экипировка ---------- */
+.pinfo{max-height:calc(100% - 20px);overflow-y:auto}
+.pinfo .pi-bm{color:var(--gold);font-family:var(--f-display);font-weight:700}
+.pinfo .pi-sec{display:flex;justify-content:space-between;align-items:baseline;margin-top:2px;font:700 14px var(--f-display);color:var(--parch);text-align:left}
+.pinfo .pi-sec small{font:12px var(--f-body);color:var(--muted)}
+.pinfo .pi-eq{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
+.pinfo .pi-eq .slot{padding:0;box-shadow:inset 0 0 0 1px #000,inset 0 2px 5px rgba(0,0,0,.6)}
+.pinfo .pi-eq .slot img{width:80%}
+.pinfo .pi-eq .slot.sel{outline:2px solid #fff;outline-offset:1px}
+.pinfo .pi-it{min-height:38px;text-align:left;font-size:13px}
+.pinfo .pi-it b{display:block;font-family:var(--f-display)} .pinfo .pi-it small{color:var(--muted);font-size:12px}
+.pinfo .pi-it ul{list-style:none;margin:6px 0 0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:2px 12px}
+.pinfo .pi-it li{display:flex;justify-content:space-between} .pinfo .pi-it li b{display:inline;color:var(--fg)} .pinfo .pi-it li i{display:none}
+/* ---------- имя игрока в HUD ---------- */
+.hname{font:700 12px/1 var(--f-display);color:var(--parch);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 0 #000}
+.hname[hidden]{display:none}
