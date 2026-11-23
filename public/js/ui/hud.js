@@ -15,7 +15,7 @@ function hud(){
   setT('gold',fmt(S.gold)); setT('lvl',String(S.lvl));
   setT('hpt',fmt(hero.hp)+' / '+fmt(mh));
   $('hpb').style.width=(hero.hp/mh*100)+'%';
-  $('xpb').style.width=(S.xp/xpNeed(S.lvl)*100)+'%';
+  $('xpb').style.width=(S.xp/xpNeed(S.lvl)*100)+'%'; setT('xpt',fmt(S.xp)+' / '+fmt(xpNeed(S.lvl)));
   setT('stones',fmt(S.stones||0)); potHud();
   setT('dps',fmt(st.dps())); setT('best',String(S.best));
   $('dot-hero').hidden=!UPG.some(u=>!(u.max!=null&&S.upg[u.id]>=u.max) && S.gold>=upCost(u,S.upg[u.id]) && (S.stones||0)>=stoneCost(S.upg[u.id]));

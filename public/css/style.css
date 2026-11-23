@@ -35,8 +35,8 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .bar{position:relative;height:9px;background:#24182f;border-radius:2px;overflow:hidden}
 .bar i{position:absolute;inset:0;width:0;transition:width .15s linear}
 .bar.hp i{background:linear-gradient(#ff5a6e,var(--hp) 60%,#a51c31)}
-.bar.xp{height:5px}
-.bar.xp i{background:var(--xp)}
+.bar.xp{height:9px}
+.bar.xp i{background:linear-gradient(#e8bf62,#b8862e 60%,#7a5418)}
 .bar b{position:absolute;inset:0;font:600 8px/9px var(--f-display);text-align:center;color:#fff;text-shadow:0 1px 0 #000}
 .res{display:flex;flex-direction:column;gap:5px;align-items:flex-end}
 .chip{display:flex;align-items:center;gap:6px;background:rgba(12,7,9,.72);border:1px solid var(--line);border-radius:6px;padding:4px 9px 4px 6px;font-family:var(--f-display);font-size:16px;line-height:1}
