@@ -69,9 +69,11 @@ module.exports = function chatRouter(pool, auth) {
       if (times.length && now - times[times.length - 1] < MIN_GAP_MS || times.length >= PER_MIN)
         return res.status(429).json({ error: 'too fast' });
 
+      const ban = await pool.query('SELECT chat_banned FROM players WHERE tg_id = $1', [req.tgId]);
+      if (ban.rows[0] && ban.rows[0].chat_banned) return res.status(403).json({ error: 'banned' });
       let to = null, replyTo = null;
       if (b.to != null) {
-        if (!isId(b.to) || String(b.to) === String(req.tgId)) return res.status(400).json({ error: 'bad recipient' });
+        if (!isId(b.to) || String(b.to) === String(req.tgId) || String(b.to) === '0') return res.status(400).json({ error: 'bad recipient' });
         const { rows } = await pool.query(
           `SELECT p.tg_id, EXISTS (SELECT 1 FROM chat_blocks WHERE tg_id = p.tg_id AND blocked_id = $2) AS blocked_me
            FROM players p WHERE p.tg_id = $1`, [b.to, req.tgId]);

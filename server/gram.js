@@ -76,10 +76,10 @@ module.exports = function gram(pool, { receiver, rate, toncenter, apiKey }) {
       const [bal, once, ung] = await Promise.all([
         balance(req.tgId),
         pool.query(`SELECT item FROM shop_purchases WHERE tg_id = $1 AND item = ANY($2)`, [req.tgId, Object.keys(PACKS).filter(k => PACKS[k].once).map(k => `pack:${k}`)]),
-        pool.query(`SELECT id, item FROM shop_purchases WHERE tg_id = $1 AND NOT granted ORDER BY id`, [req.tgId]),
+        pool.query(`SELECT id, item, price FROM shop_purchases WHERE tg_id = $1 AND NOT granted ORDER BY id`, [req.tgId]),
       ]);
       res.json({ balance: bal, prices: CATALOG, topup: enabled ? packages.map(({ id, ton, bonus, gram }) => ({ id, ton, bonus, gram })) : null,
-        bought: once.rows.map(r => r.item), ungranted: ung.rows.map(r => ({ id: Number(r.id), item: r.item })) });
+        bought: once.rows.map(r => r.item), ungranted: ung.rows.map(r => ({ id: Number(r.id), item: r.item, gift: Number(r.price) === 0 })) });
     } catch (e) { next(e); }
   });
   // покупка: цена берётся только из каталога сервера

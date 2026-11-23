@@ -9,6 +9,7 @@ const chatRouter = require('./chat');
 const referralsModule = require('./referrals');
 const botModule = require('./bot');
 const gramModule = require('./gram');
+const adminModule = require('./admin');
 
 const env = process.env;
 const PORT = +env.PORT || 3000;
@@ -66,6 +67,7 @@ function auth(req, res, next) {
 }
 
 const referrals = referralsModule(pool, { links: refLink });
+const admin = adminModule(pool, { password: env.ADMIN_PASSWORD || '', adminIds: env.ADMIN_IDS || '', sign, readToken, getCookie, cookieOpts });
 const gram = gramModule(pool, {
   receiver: env.TON_RECEIVER || '',                       // кошелёк игры для приёма TON
   rate: Number(env.GRAM_PER_TON) || 100,                  // сколько GRAM за 1 TON
@@ -118,7 +120,7 @@ api.post('/auth/telegram', async (req, res, next) => {
     if (rows[0].inserted) await referrals.onNewPlayer(u.id, u._startParam || b.ref).catch(e => console.error('referral:', e.message));
     const token = makeToken(u.id);
     res.cookie(COOKIE, token, { ...cookieOpts(req), maxAge: SESSION_DAYS * 86400 * 1000 });
-    res.json({ token, user: { id: u.id, username: u.username || null, firstName: u.first_name || '' } });
+    res.json({ token, user: { id: u.id, username: u.username || null, firstName: u.first_name || '', admin: admin.isAdminId(u.id) } });
   } catch (e) { next(e); }
 });
 
@@ -128,7 +130,7 @@ api.get('/me', auth, async (req, res, next) => {
   try {
     const { rows } = await pool.query('SELECT tg_id, username, first_name FROM players WHERE tg_id = $1', [req.tgId]);
     if (!rows[0]) return res.status(401).json({ error: 'unauthorized' });
-    res.json({ user: { id: Number(rows[0].tg_id), username: rows[0].username, firstName: rows[0].first_name || '' } });
+    res.json({ user: { id: Number(rows[0].tg_id), username: rows[0].username, firstName: rows[0].first_name || '', admin: admin.isAdminId(rows[0].tg_id) } });
   } catch (e) { next(e); }
 });
 
@@ -164,6 +166,7 @@ api.use('/friends', auth, referrals.router);
 api.use('/gram', auth, gram.router);
 app.use('/api', api);
 app.use('/tg/webhook', bot.router);
+app.use('/admin', admin.router);
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
 app.use((err, req, res, next) => {

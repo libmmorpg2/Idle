@@ -168,8 +168,9 @@ function openPicker(first){
   PK.open=true; PK.first=!!first; $('picker').hidden=false; $('pkClose').hidden=!!first;
   const k=Math.max(0,PK_IDS().indexOf(S.hero)); PK.idx=k; PK.pos=k; PK.t0=performance.now(); PK.last=0; pkRender();
   cancelAnimationFrame(PK.raf); PK.raf=requestAnimationFrame(pkDraw);
+  if(typeof gameRunCheck==='function') gameRunCheck();
 }
-function closePicker(){ PK.open=false; $('picker').hidden=true; cancelAnimationFrame(PK.raf); }
+function closePicker(){ PK.open=false; $('picker').hidden=true; cancelAnimationFrame(PK.raf); if(typeof gameRunCheck==='function') gameRunCheck(); }
 (function(){
   const sc=$('pkScene');
   sc.addEventListener('pointerdown',e=>{ if(e.target.closest('button')) return; PK.drag={x:e.clientX,p:PK.pos,id:e.pointerId,moved:false}; try{ sc.setPointerCapture(e.pointerId); }catch(_){} });

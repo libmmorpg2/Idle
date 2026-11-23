@@ -49,7 +49,7 @@ var LOAD=(function(){
   }
   requestAnimationFrame(tick);
   function finish(){ done=true; fill.style.width='100%'; st.textContent=T('Готово'); st.classList.remove('err');
-    setTimeout(function(){ el.classList.add('out'); clearInterval(tipTimer);
+    setTimeout(function(){ el.classList.add('out'); clearInterval(tipTimer); window.dispatchEvent(new Event('loaderdone'));
       setTimeout(function(){ if(typeof SPLASH!=="undefined"&&SPLASH) SPLASH.stop(); el.remove(); },700); },120); }
   var TIPS=[T('Герой сражается и без тебя — до 8 часов добычи, пока ты офлайн'),
     T('Зелья дают +20% на 10 минут, а их время складывается до часа'),

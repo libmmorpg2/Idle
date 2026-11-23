@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Rampage · Админ-панель</title>
+<style>
+:root{--bg:#0c0912;--p:#16111f;--p2:#1f1830;--line:#33264a;--fg:#ece4f2;--mu:#968aa3;--acc:#c9a25a;--blue:#2f8fe0;--ok:#5fd39b;--bad:#ff6a6a;--gram:#7fdcff}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.4 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+a{color:#8fc8ff}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer;border:1px solid var(--line);background:var(--p2);border-radius:6px;padding:7px 12px}
+button.pri{background:var(--blue);border-color:var(--blue);color:#fff;font-weight:600}
+button.bad{border-color:#7a2a2a;color:#ffb0a8;background:#2a1418}
+button:disabled{opacity:.5;cursor:default}
+input,select{background:#120d1a;border:1px solid var(--line);border-radius:6px;padding:7px 9px;min-width:0}
+header{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:10px;padding:10px 16px;background:#110c18ee;border-bottom:1px solid var(--line);backdrop-filter:blur(6px)}
+header h1{margin:0;font-size:17px;color:var(--acc);white-space:nowrap}
+nav{display:flex;gap:4px;overflow-x:auto;flex:1}
+nav button{border:0;background:none;color:var(--mu);white-space:nowrap}
+nav button.on{background:var(--p2);color:var(--fg)}
+main{max-width:1200px;margin:0 auto;padding:16px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px}
+.card{background:var(--p);border:1px solid var(--line);border-radius:10px;padding:12px}
+.card small{display:block;color:var(--mu);font-size:12px}
+.card b{display:block;font-size:24px;margin:2px 0}
+.card span{font-size:12px;color:var(--mu)}
+.sec{margin:20px 0 8px;font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--acc)}
+.bars{display:flex;align-items:flex-end;gap:4px;height:140px;padding:10px;background:var(--p);border:1px solid var(--line);border-radius:10px}
+.bars div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:3px;height:100%;font-size:10px;color:var(--mu)}
+.bars i{display:block;width:100%;max-width:26px;background:linear-gradient(#6a8cff,#3a4fb0);border-radius:3px 3px 0 0;min-height:2px}
+.bars em{font-style:normal;color:var(--fg)}
+.tools{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.tools input{flex:1;min-width:180px}
+.tbl{width:100%;border-collapse:collapse;background:var(--p);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.tbl th,.tbl td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+.tbl th{font-size:12px;color:var(--mu);font-weight:600;background:#140f1c}
+.tbl tr.click{cursor:pointer} .tbl tr.click:hover td{background:#1d1628}
+.wrap{overflow-x:auto}
+.num{font-variant-numeric:tabular-nums;white-space:nowrap}
+.mu{color:var(--mu)} .ok{color:var(--ok)} .badc{color:var(--bad)} .gram{color:var(--gram)}
+.pic{width:36px;height:27px;image-rendering:pixelated;border-radius:4px;border:1px solid var(--line);object-fit:cover;vertical-align:middle;background:#120d1a}
+.tag{display:inline-block;padding:1px 6px;border-radius:4px;font-size:11px;background:var(--p2);border:1px solid var(--line)}
+.tag.red{background:#3a1418;border-color:#7a2a2a;color:#ffb0a8}
+.uhead{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.uhead img{width:72px;height:72px;border-radius:12px;object-fit:cover;image-rendering:pixelated;border:1px solid var(--line);background:#120d1a}
+.uhead h2{margin:0;font-size:22px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:12px}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-size:13px} .kv dt{color:var(--mu)} .kv dd{margin:0}
+.items{display:flex;flex-direction:column;gap:4px;font-size:13px}
+.it{display:flex;gap:8px;align-items:baseline;padding:5px 8px;border-radius:6px;background:#120d1a;border-left:3px solid var(--rc,#555)}
+.it b{color:var(--rc)} .it small{color:var(--mu)}
+.form{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 0;border-bottom:1px dashed var(--line)}
+.form label{min-width:110px;color:var(--mu);font-size:13px}
+.form input[type=number]{width:110px}
+.msg{display:flex;gap:8px;align-items:flex-start;padding:8px 10px;border-bottom:1px solid var(--line)}
+.msg .t{flex:1;min-width:0;overflow-wrap:anywhere}
+.msg .t small{color:var(--mu);margin-left:6px}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);padding:10px 16px;border-radius:8px;background:#1f3a2a;border:1px solid var(--ok);z-index:20}
+.toast.err{background:#3a1418;border-color:var(--bad)}
+.login{max-width:340px;margin:12vh auto;display:flex;flex-direction:column;gap:10px;text-align:center}
+.back{margin-bottom:12px}
+@media (max-width:640px){ header{flex-wrap:wrap} nav{order:3;flex-basis:100%} .hide-m{display:none} main{padding:12px} }
+</style>
+</head>
+<body>
+<header><h1>⚔️ Rampage · админ</h1><nav id="nav"></nav><a href="/" class="mu">← в игру</a></header>
+<main id="main"></main>
+<script>
+/* ---------- справочники ---------- */
+const HERO={mage:'Маг бездны',tank:'Викинг',asn:'Хранительница клинков',sam:'Лесной следопыт'};
+const SLOT={weapon:'Оружие',helm:'Шлем',armor:'Доспех',gloves:'Перчатки',belt:'Пояс',pants:'Поножи',boots:'Обувь',cloak:'Накидка',amulet:'Амулет',ring:'Кольцо'};
+const RAR=[['Обычный','#a59cb0'],['Необычный','#5fd39b'],['Редкий','#5aa8ff'],['Эпический','#c46bff'],['Легендарный','#f3a43a'],['Мифический','#3fe0e6']];
+const STAT={dmg:'урон',hp:'здоровье',spd:'скорость',crit:'крит',gold:'удача'};
+const PET={hound:'Боевой пёс',boar:'Бронекабан',bat:'Ночная мышь',fairy:'Лесная фея',wolf:'Волк в латах',imp:'Бесёнок',direwolf:'Лютоволк',griffin:'Грифон',wisp:'Огненный дух',dragon:'Кристальный дракон',icefairy:'Ледяная фея',jaguar:'Теневой ягуар',succubus:'Суккуба',ghostwolf:'Призрачный волк',unicorn:'Боевой единорог',phoenix:'Феникс',ancient:'Древний дракон'};
+const CAPE={travel:'Дорожный плащ',ranger:'Плащ следопыта',crimson:'Багровый плащ',frost:'Плащ вечной зимы',archmage:'Плащ архимага',shadow:'Покров тени',dragonslayer:'Плащ драконоборца',celestial:'Мантия небожителя'};
+const POT={atk:'Зелье силы',def:'Зелье стойкости',aps:'Зелье ярости',run:'Зелье ветра',crit:'Зелье меткости',xp:'Зелье мудрости',gold:'Зелье удачи'};
+const PACK={starter:'Стартовый пак героя',epic:'Эпический пак',legendary:'Легендарный пак'};
+
+/* ---------- помощники ---------- */
+const $=s=>document.querySelector(s), main=$('#main');
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=n=>{ n=Number(n)||0; const a=Math.abs(n); return a>=1e9?(n/1e9).toFixed(2)+'B':a>=1e6?(n/1e6).toFixed(2)+'M':a>=1e4?(n/1e3).toFixed(1)+'K':String(Math.round(n)); };
+const dt=t=>t?new Date(t).toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'}):'—';
+const ago=t=>{ if(!t) return '—'; const s=(Date.now()-new Date(t))/1000; return s<60?'сейчас':s<3600?Math.floor(s/60)+' мин':s<86400?Math.floor(s/3600)+' ч':Math.floor(s/86400)+' д'; };
+const ton=n=>(Number(n)/1e9).toLocaleString('ru-RU',{maximumFractionDigits:3})+' TON';
+function itemLabel(item){ const [k,a,b,c,d]=String(item).split(':');
+  if(k==='pack') return PACK[a]||item; if(k==='pet') return 'Питомец: '+(PET[a]||a); if(k==='cape') return 'Плащ: '+(CAPE[a]||a);
+  if(k==='pot') return POT[a]||item;
+  if(k==='give'){ if(a==='gold') return fmt(b)+' золота'; if(a==='stones') return b+' осколков'; if(a==='scr') return b+' свитков'; if(a==='safe') return b+' безоп. свитков';
+    if(a==='pot') return (POT[b]||b)+' ×'+c;
+    if(a==='item'){ const [,,cls,slot,rar,lvl]=String(item).split(':'); return `${RAR[rar]?RAR[rar][0]:''} ${(SLOT[slot]||slot).toLowerCase()} · ${HERO[cls]||cls} · ур.${lvl}`; } }
+  return item; }
+async function api(path,opts={}){ const r=await fetch('/admin/api/'+path,{credentials:'same-origin',...opts,headers:{'Content-Type':'application/json',...(opts.headers||{})}});
+  if(r.status===401){ showLogin(); throw new Error('unauthorized'); } const j=await r.json().catch(()=>({})); if(!r.ok) throw new Error(j.error||r.status); return j; }
+const post=(path,body)=>api(path,{method:'POST',body:JSON.stringify(body)});
+function toast(t,err){ const d=document.createElement('div'); d.className='toast'+(err?' err':''); d.textContent=t; document.body.append(d); setTimeout(()=>d.remove(),2600); }
+
+/* ---------- вход ---------- */
+async function showLogin(){
+  $('#nav').innerHTML=''; let info={}; try{ info=await fetch('/admin/api/me').then(r=>r.json()); }catch(e){}
+  main.innerHTML=`<div class="login"><h2>Вход в админ-панель</h2>
+    ${info.passwordLogin?`<input id="pw" type="password" placeholder="Пароль администратора" autofocus><button class="pri" id="go">Войти</button>`:''}
+    <p class="mu">${info.passwordLogin?'Или откройте панель из игры аккаунтом Telegram, указанным в ADMIN_IDS.':'Откройте панель из игры аккаунтом Telegram, указанным в ADMIN_IDS (или задайте ADMIN_PASSWORD на сервере).'}</p></div>`;
+  if(info.passwordLogin){ const go=async()=>{ const r=await fetch('/admin/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:$('#pw').value})});
+      if(r.ok) init(); else toast((await r.json().catch(()=>({}))).error==='wrong password'?'Неверный пароль':'Слишком много попыток, подождите',true); };
+    $('#go').onclick=go; $('#pw').onkeydown=e=>{ if(e.key==='Enter') go(); }; }
+}
+
+/* ---------- навигация ---------- */
+const TABS={stats:['📊 Обзор',viewStats],users:['👥 Игроки',viewUsers],chat:['💬 Чат',viewChat],pay:['💎 Платежи',viewPay]};
+let tab='stats';
+function go(t,arg){ tab=t; $('#nav').innerHTML=Object.entries(TABS).map(([k,[n]])=>`<button data-t="${k}" class="${k===t?'on':''}">${n}</button>`).join('');
+  main.innerHTML='<p class="mu">Загрузка…</p>'; TABS[t][1](arg).catch(e=>{ if(e.message!=='unauthorized') main.innerHTML=`<p class="badc">Ошибка: ${esc(e.message)}</p>`; }); }
+$('#nav').onclick=e=>{ const b=e.target.closest('[data-t]'); if(b) go(b.dataset.t); };
+
+/* ---------- обзор ---------- */
+async function viewStats(){
+  const s=await api('stats'), card=(t,v,sub)=>`<div class="card"><small>${t}</small><b>${v}</b><span>${sub||''}</span></div>`;
+  const max=Math.max(1,...s.days.map(d=>+d.reg));
+  main.innerHTML=`<div class="cards">
+    ${card('Игроков',fmt(s.players.total),`+${s.players.d1} за сутки · +${s.players.d7} за неделю`)}
+    ${card('Онлайн (15 мин)',s.active.online,`активны за сутки: ${s.active.d1} · за неделю: ${s.active.d7}`)}
+    ${card('Оплаты TON',s.payments.n,`${s.payments.ton.toLocaleString('ru-RU',{maximumFractionDigits:2})} TON · платящих: ${s.payments.payers}`)}
+    ${card('GRAM на руках',`<span class="gram">${fmt(s.players.gram)}</span>`,`куплено: ${fmt(s.gram.bought)} · потрачено: ${fmt(s.gram.spent)}`)}
+    ${card('Покупок в магазине',s.purchases.n,'')}
+    ${card('Сообщений в чате',fmt(s.chat.n),`за сутки: ${s.chat.d1}`)}
+    ${card('Рефералов',s.referrals.n,'приглашено друзьями')}
+  </div>
+  <div class="sec">Регистрации за 14 дней</div>
+  <div class="bars">${s.days.map(d=>`<div><em>${d.reg}</em><i style="height:${d.reg/max*100}%"></i>${d.day}</div>`).join('')}</div>
+  <div class="sec">Герои игроков</div>
+  <div class="cards">${s.heroes.map(h=>card(HERO[h.hero]||'—',h.n,'')).join('')}</div>`;
+}
+
+/* ---------- игроки ---------- */
+let uq='',usort='last',upage=0;
+async function viewUsers(){
+  main.innerHTML=`<div class="tools"><input id="q" placeholder="Поиск: имя, @username или Telegram ID" value="${esc(uq)}">
+    <select id="sort">${[['last','Последняя активность'],['new','Новые'],['lvl','Уровень'],['bm','Боевая мощь'],['gram','GRAM'],['refs','Рефералы']].map(([v,n])=>`<option value="${v}" ${v===usort?'selected':''}>${n}</option>`).join('')}</select></div>
+    <div class="wrap" id="ulist"><p class="mu">Загрузка…</p></div>`;
+  let tm; $('#q').oninput=e=>{ clearTimeout(tm); tm=setTimeout(()=>{ uq=e.target.value; upage=0; loadUsers(); },300); };
+  $('#sort').onchange=e=>{ usort=e.target.value; upage=0; loadUsers(); };
+  await loadUsers();
+}
+async function loadUsers(){
+  const j=await api(`users?q=${encodeURIComponent(uq)}&sort=${usort}&page=${upage}`);
+  $('#ulist').innerHTML=`<table class="tbl"><tr><th></th><th>Игрок</th><th>Ур.</th><th class="hide-m">Зона</th><th>БМ</th><th>GRAM</th><th class="hide-m">Друзья</th><th class="hide-m">Регистрация</th><th>Был</th></tr>
+    ${j.users.map(u=>`<tr class="click" data-u="${u.tg_id}"><td><img class="pic" src="/assets/img/portraits/${HERO[u.hero]?u.hero:'mage'}.png" alt=""></td>
+      <td><b>${esc(u.name)}</b> ${u.chat_banned?'<span class="tag red">бан чата</span>':''}<br><small class="mu">${u.username?'@'+esc(u.username)+' · ':''}${u.tg_id}${u.ref_by?' · пригл. '+u.ref_by:''}</small></td>
+      <td class="num">${u.lvl||'—'}</td><td class="num hide-m">${u.best||'—'}</td><td class="num">${fmt(u.bm)}</td><td class="num gram">${fmt(u.gram)}</td>
+      <td class="num hide-m">${u.refs}</td><td class="hide-m mu">${dt(u.created_at)}</td><td class="mu">${ago(u.updated_at||u.last_login)}</td></tr>`).join('')||'<tr><td colspan="9" class="mu">Никого не найдено</td></tr>'}</table>
+    <div class="tools" style="margin-top:10px">${upage?'<button id="prev">← Назад</button>':''}${j.more?'<button id="next">Дальше →</button>':''}</div>`;
+  if($('#prev')) $('#prev').onclick=()=>{ upage--; loadUsers(); }; if($('#next')) $('#next').onclick=()=>{ upage++; loadUsers(); };
+  $('#ulist').onclick=e=>{ const tr=e.target.closest('[data-u]'); if(tr) viewUser(tr.dataset.u); };
+}
+function itemRow(it){ if(!it) return ''; const r=RAR[it.rar]||RAR[0];
+  return `<div class="it" style="--rc:${r[1]}"><b>${it.en?'+'+it.en+' ':''}${SLOT[it.slot]||it.slot}</b><span>${r[0]} · ${HERO[it.cls]||it.cls} · ур.${it.lvl}</span>
+    <small>${Object.entries(it.st||{}).map(([k,v])=>`${STAT[k]||k} +${v}`).join(', ')}</small></div>`; }
+async function viewUser(id){
+  tab='users'; main.innerHTML='<p class="mu">Загрузка…</p>';
+  const u=await api('users/'+id), p=u.player, st=(u.save&&u.save.state)||{}, inv=st.inv||{}, eq=inv.eq||{};
+  const pets=Object.keys((st.pets||{}).own||{}).map(k=>PET[k]+((st.pets.act===k)?' ✓':'')).join(', ')||'—';
+  const capes=Object.keys((st.capes||{}).own||{}).map(k=>CAPE[k]+((st.capes.act===k)?' ✓':'')).join(', ')||'—';
+  const pots=Object.entries(((st.pot||{}).own)||{}).filter(([,n])=>n>0).map(([k,n])=>`${POT[k]||k} ×${n}`).join(', ')||'—';
+  const books=Object.entries(st.books||{}).flatMap(([c,o])=>Object.entries(o).filter(([,n])=>n>0).map(([k,n])=>`${HERO[c]||c}: ${k} ×${n}`)).join(', ')||'—';
+  const opt=o=>Object.entries(o).map(([k,v])=>`<option value="${k}">${esc(v)}</option>`).join('');
+  main.innerHTML=`<button class="back" id="back">← Все игроки</button>
+  <div class="card uhead"><img src="${p.photo_url?esc(p.photo_url):'/assets/img/portraits/'+(HERO[st.hero]?st.hero:'mage')+'.png'}" alt="" referrerpolicy="no-referrer">
+    <div style="flex:1;min-width:200px"><h2>${esc(p.name)}${p.last_name?' '+esc(p.last_name):''} ${p.chat_banned?'<span class="tag red">бан чата</span>':''}</h2>
+      <div class="mu">${p.username?`<a href="https://t.me/${esc(p.username)}" target="_blank" rel="noopener">@${esc(p.username)}</a> · `:''}ID ${p.tg_id}</div>
+      <div class="mu">Регистрация ${dt(p.created_at)} · вход ${dt(p.last_login)} · сохранение ${dt(u.save&&u.save.updated_at)}</div>
+      ${p.ton_address?`<div class="mu">TON: <code>${esc(p.ton_address)}</code></div>`:''}</div>
+    <div class="card" style="text-align:center"><small>GRAM</small><b class="gram" id="ugram">${fmt(p.gram)}</b></div></div>
+  <div class="grid2" style="margin-top:12px">
+    <div class="card"><div class="sec" style="margin-top:0">Прогресс</div><dl class="kv">
+      <dt>Герой</dt><dd>${HERO[st.hero]||'—'}</dd><dt>Уровень</dt><dd>${st.lvl||'—'}</dd><dt>Зона / рекорд</dt><dd>${st.zone||'—'} / ${st.best||'—'}</dd>
+      <dt>Боевая мощь</dt><dd>${fmt(st.bm)}</dd><dt>Золото</dt><dd>${fmt(st.gold)}</dd><dt>Осколки души</dt><dd>${fmt(st.stones)}</dd>
+      <dt>Свитки</dt><dd>${(inv.scr||{}).n||0} обычных · ${(inv.scr||{}).s||0} безопасных</dd><dt>Питомцы</dt><dd>${pets}</dd><dt>Плащи</dt><dd>${capes}</dd>
+      <dt>Зелья</dt><dd>${pots}</dd><dt>Книги</dt><dd>${books}</dd>
+      <dt>Убито</dt><dd>${fmt((st.prof||{}).k)} врагов · ${fmt((st.prof||{}).b)} боссов</dd><dt>В игре</dt><dd>${Math.round(((st.prof||{}).t||0)/3600)} ч</dd></dl></div>
+    <div class="card"><div class="sec" style="margin-top:0">Выдача</div>
+      <div class="form"><label>GRAM ±</label><input type="number" id="gAmt" placeholder="100 или -50"><input id="gNote" placeholder="причина" style="flex:1"><button class="pri" data-give="gram">Начислить</button></div>
+      <div class="form"><label>Ресурс</label><select id="rKind"><option value="gold">Золото</option><option value="stones">Осколки души</option><option value="scr">Свитки заточки</option><option value="safe">Безопасные свитки</option></select><input type="number" id="rAmt" value="1000"><button class="pri" data-give="res">Выдать</button></div>
+      <div class="form"><label>Зелье</label><select id="potId">${opt(POT)}</select><input type="number" id="potN" value="5"><button class="pri" data-give="pot">Выдать</button></div>
+      <div class="form"><label>Питомец</label><select id="petId">${opt(PET)}</select><button class="pri" data-give="pet">Выдать</button></div>
+      <div class="form"><label>Плащ</label><select id="capeId">${opt(CAPE)}</select><button class="pri" data-give="cape">Выдать</button></div>
+      <div class="form"><label>Пак</label><select id="packId">${opt(PACK)}</select><button class="pri" data-give="pack">Выдать</button></div>
+      <div class="form"><label>Вещь</label><select id="iCls">${opt(HERO)}</select><select id="iSlot">${opt(SLOT)}</select><select id="iRar">${RAR.map((r,i)=>`<option value="${i}">${r[0]}</option>`).join('')}</select><input type="number" id="iLvl" value="${st.best||1}" title="уровень"><button class="pri" data-give="item">Выдать</button></div>
+      <p class="mu" style="font-size:12px;margin:8px 0 0">GRAM начисляются сразу. Остальное игра выдаст при следующем входе игрока или в течение минуты, если он сейчас в игре.</p></div>
+    <div class="card"><div class="sec" style="margin-top:0">Надето</div>${Object.entries(eq).map(([c,o])=>{ const its=Object.values(o||{}).filter(Boolean); return its.length?`<p class="mu" style="margin:6px 0 4px">${HERO[c]||c}</p><div class="items">${its.map(itemRow).join('')}</div>`:''; }).join('')||'<p class="mu">Ничего</p>'}</div>
+    <div class="card"><div class="sec" style="margin-top:0">Сумка · ${(inv.bag||[]).length}</div><div class="items" style="max-height:420px;overflow:auto">${(inv.bag||[]).slice().sort((a,b)=>b.rar-a.rar||b.lvl-a.lvl).map(itemRow).join('')||'<p class="mu">Пусто</p>'}</div></div>
+    <div class="card"><div class="sec" style="margin-top:0">Рефералы</div>
+      <p>${u.invitedBy?`Пригласил: <a href="#" data-u="${u.invitedBy.id}">${esc(u.invitedBy.name)}</a>`:'<span class="mu">Пришёл сам</span>'}</p>
+      <p class="mu">Пригласил друзей: ${u.invited.length}</p>
+      <div class="items">${u.invited.map(f=>`<div class="it"><a href="#" data-u="${f.id}">${esc(f.name)}</a><small>ур.${f.lvl||'—'} · БМ ${fmt(f.bm)} · ${dt(f.created_at)}</small></div>`).join('')}</div></div>
+    <div class="card"><div class="sec" style="margin-top:0">Чат</div>
+      <p><button id="ban" class="${p.chat_banned?'':'bad'}">${p.chat_banned?'Снять бан чата':'Забанить в чате'}</button> <span class="mu">заблокировал игроков: ${u.blocks.length}</span></p>
+      <div style="max-height:300px;overflow:auto">${u.messages.map(m=>`<div class="msg"><div class="t">${m.to_tg_id!=null?`<span class="tag">лично → ${esc(m.to_name)}</span> `:''}${esc(m.text)}<small>${dt(m.created_at)}</small></div><button class="bad" data-del="${m.id}">✕</button></div>`).join('')||'<p class="mu">Сообщений нет</p>'}</div></div>
+    <div class="card"><div class="sec" style="margin-top:0">GRAM: журнал</div><table class="tbl">${u.ledger.map(l=>`<tr><td class="num ${l.amount>0?'ok':'badc'}">${l.amount>0?'+':''}${l.amount}</td><td>${esc(l.reason.replace(/^buy:/,'покупка: ').replace(/^topup:/,'пополнение #'))}</td><td class="mu">${dt(l.created_at)}</td></tr>`).join('')||'<tr><td class="mu">Пусто</td></tr>'}</table></div>
+    <div class="card"><div class="sec" style="margin-top:0">Покупки и выдачи</div><table class="tbl">${u.purchases.map(s=>`<tr><td>${esc(itemLabel(s.item))}</td><td class="num gram">${s.price||'подарок'}</td><td>${s.granted?'<span class="ok">выдано</span>':'<span class="mu">ждёт входа</span>'}</td><td class="mu">${dt(s.created_at)}</td></tr>`).join('')||'<tr><td class="mu">Пусто</td></tr>'}</table>
+      <div class="sec">Заказы TON</div><table class="tbl">${u.orders.map(o=>`<tr><td>#${o.id}</td><td>${ton(o.amount_nano)} → <span class="gram">${o.gram}</span></td><td class="${o.status==='paid'?'ok':'mu'}">${o.status==='paid'?'оплачен':'ждёт'}</td><td class="mu">${dt(o.paid_at||o.created_at)}</td></tr>`).join('')||'<tr><td class="mu">Нет</td></tr>'}</table></div>
+  </div>`;
+  $('#back').onclick=()=>go('users');
+  main.querySelectorAll('[data-u]').forEach(a=>a.onclick=e=>{ e.preventDefault(); viewUser(a.dataset.u); });
+  main.querySelectorAll('[data-del]').forEach(b=>b.onclick=async()=>{ if(!confirm('Удалить сообщение?')) return; await api('chat/'+b.dataset.del,{method:'DELETE'}); b.closest('.msg').remove(); toast('Удалено'); });
+  $('#ban').onclick=async()=>{ await post(`users/${id}/chatban`,{ban:!p.chat_banned}); toast(p.chat_banned?'Бан снят':'Игрок забанен в чате'); viewUser(id); };
+  main.querySelectorAll('[data-give]').forEach(b=>b.onclick=async()=>{
+    const k=b.dataset.give; let body, path=`users/${id}/give`;
+    if(k==='gram'){ const a=+$('#gAmt').value; if(!a) return toast('Укажите количество',true); if(!confirm(`${a>0?'Начислить':'Списать'} ${Math.abs(a)} GRAM?`)) return;
+      try{ const j=await post(`users/${id}/gram`,{amount:a,note:$('#gNote').value}); $('#ugram').textContent=fmt(j.gram); toast('GRAM: '+j.gram); }catch(e){ toast(e.message,true); } return; }
+    if(k==='res') body={kind:$('#rKind').value,amount:+$('#rAmt').value};
+    if(k==='pot') body={kind:'pot',id:$('#potId').value,amount:+$('#potN').value};
+    if(k==='pet') body={kind:'pet',id:$('#petId').value}; if(k==='cape') body={kind:'cape',id:$('#capeId').value}; if(k==='pack') body={kind:'pack',id:$('#packId').value};
+    if(k==='item') body={kind:'item',cls:$('#iCls').value,slot:$('#iSlot').value,rar:+$('#iRar').value,lvl:+$('#iLvl').value};
+    b.disabled=true; try{ const j=await post(path,body); toast('Выдано: '+itemLabel(j.item)); }catch(e){ toast('Ошибка: '+e.message,true); } b.disabled=false; });
+}
+
+/* ---------- чат ---------- */
+let cdm='', cq='';
+async function viewChat(){
+  main.innerHTML=`<div class="tools"><input id="ann" maxlength="140" placeholder="Объявление в общий чат от «📢 Администрация»"><button class="pri" id="annGo">Отправить</button></div>
+    <div class="tools"><input id="cq" placeholder="Поиск по тексту" value="${esc(cq)}"><select id="cdm"><option value="">Все сообщения</option><option value="public" ${cdm==='public'?'selected':''}>Общий чат</option><option value="private" ${cdm==='private'?'selected':''}>Личные</option></select></div>
+    <div class="card" style="padding:0" id="clist"><p class="mu" style="padding:12px">Загрузка…</p></div><div class="tools" style="margin-top:10px"><button id="more">Ещё</button></div>`;
+  let before='', tm;
+  const load=async(reset)=>{ if(reset) before=''; const j=await api(`chat?dm=${cdm}&q=${encodeURIComponent(cq)}${before?'&before='+before:''}`);
+    const html=j.messages.map(m=>`<div class="msg"><div class="t"><a href="#" data-u="${m.uid}"><b>${esc(m.name)}</b></a>${m.banned?' <span class="tag red">бан</span>':''}${m.to_tg_id!=null?` <span class="tag">лично → ${esc(m.to_name)}</span>`:''}<small>${dt(m.created_at)}</small><br>${esc(m.text)}</div><button class="bad" data-del="${m.id}" title="Удалить">✕</button></div>`).join('');
+    if(reset) $('#clist').innerHTML=html||'<p class="mu" style="padding:12px">Сообщений нет</p>'; else $('#clist').insertAdjacentHTML('beforeend',html);
+    if(j.messages.length) before=j.messages[j.messages.length-1].id; $('#more').hidden=j.messages.length<100; };
+  $('#clist').onclick=async e=>{ const u=e.target.closest('[data-u]'); if(u){ e.preventDefault(); return viewUser(u.dataset.u); }
+    const d=e.target.closest('[data-del]'); if(d&&confirm('Удалить сообщение?')){ await api('chat/'+d.dataset.del,{method:'DELETE'}); d.closest('.msg').remove(); toast('Удалено'); } };
+  $('#cq').oninput=e=>{ clearTimeout(tm); tm=setTimeout(()=>{ cq=e.target.value; load(true); },300); };
+  $('#cdm').onchange=e=>{ cdm=e.target.value; load(true); };
+  $('#more').onclick=()=>load(false);
+  $('#annGo').onclick=async()=>{ const t=$('#ann').value.trim(); if(!t) return; await post('chat',{text:t}); $('#ann').value=''; toast('Объявление отправлено'); load(true); };
+  await load(true);
+}
+
+/* ---------- платежи ---------- */
+async function viewPay(){
+  const j=await api('payments');
+  main.innerHTML=`<div class="sec" style="margin-top:0">Заказы на пополнение (TON → GRAM)</div><div class="wrap"><table class="tbl"><tr><th>#</th><th>Игрок</th><th>Сумма</th><th>GRAM</th><th>Статус</th><th class="hide-m">Транзакция</th><th>Дата</th></tr>
+    ${j.orders.map(o=>`<tr><td>${o.id}</td><td><a href="#" data-u="${o.tg_id}">${esc(o.name)}</a></td><td class="num">${ton(o.amount_nano)}</td><td class="num gram">${o.gram}</td><td class="${o.status==='paid'?'ok':'mu'}">${o.status==='paid'?'оплачен':'ждёт оплату'}</td><td class="hide-m mu" style="font-size:11px">${esc(o.tx_hash||'')}</td><td class="mu">${dt(o.paid_at||o.created_at)}</td></tr>`).join('')||'<tr><td colspan="7" class="mu">Заказов нет</td></tr>'}</table></div>
+  <div class="sec">Покупки и выдачи</div><div class="wrap"><table class="tbl"><tr><th>#</th><th>Игрок</th><th>Что</th><th>GRAM</th><th>Выдано</th><th>Дата</th></tr>
+    ${j.purchases.map(s=>`<tr><td>${s.id}</td><td><a href="#" data-u="${s.tg_id}">${esc(s.name)}</a></td><td>${esc(itemLabel(s.item))}</td><td class="num gram">${s.price||'подарок'}</td><td>${s.granted?'<span class="ok">да</span>':'<span class="mu">ждёт входа</span>'}</td><td class="mu">${dt(s.created_at)}</td></tr>`).join('')||'<tr><td colspan="6" class="mu">Покупок нет</td></tr>'}</table></div>`;
+  main.querySelectorAll('[data-u]').forEach(a=>a.onclick=e=>{ e.preventDefault(); viewUser(a.dataset.u); });
+}
+
+async function init(){ const r=await fetch('/admin/api/me'); if(!r.ok) return showLogin(); go('stats'); }
+init();
+</script>
+</body>
+</html>

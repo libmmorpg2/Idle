@@ -42,6 +42,14 @@ function grantPack(P){
 }
 function grantItem(item){
   const [k,id]=item.split(':');
+  if(k==='give'){ const a=item.split(':').slice(2), n=+a[a.length-1]||1;   // подарок от администрации
+    if(id==='gold'){ S.gold+=n; return `${fmt(n)} ${T('золота')}`; }
+    if(id==='stones'){ S.stones=(S.stones||0)+n; return `${fmt(n)} ${T('осколков души')}`; }
+    if(id==='scr'){ S.inv.scr.n+=n; return `${n} ${T('свитков заточки')}`; }
+    if(id==='safe'){ S.inv.scr.s+=n; return `${n} ${T('безопасных свитков')}`; }
+    if(id==='pot'){ const s=potSt(); s.own[a[0]]=(s.own[a[0]]||0)+n; const p=POTS.find(x=>x.id===a[0]); return p?`${p.name} ×${n}`:''; }
+    if(id==='item'){ const [cls,slot,rar,lvl]=a; if(!HEROES[cls]||!SLOT_RU[slot]) return; const it=makeItem(cls,slot,+rar,+lvl); S.inv.bag.push(it); return itemName(it); }
+    return; }
   if(k==='pack'){ const P=PACKS.find(p=>p.id===id); if(P) grantPack(P); return P&&P.name; }
   if(k==='pot'){ const s=potSt(); s.own[id]=(s.own[id]||0)+1; const p=POTS.find(x=>x.id===id); return p&&p.name; }
   if(k==='pet'||k==='cape'){ const so=KIND[k].st(), d=KIND[k].list().find(x=>x.id===id); if(!d) return; if(so.own[id]) S.stones+=20; else so.own[id]=1; return d.name; }
@@ -53,7 +61,8 @@ async function gramAck(ids){ if(ids.length&&await saveNow()) api('gram/ack',{met
 async function gramLoad(){
   try{ const r=await api('gram'); if(!r.ok) return; const j=await r.json();
     GRAM.balance=j.balance; GRAM.prices=j.prices; GRAM.topup=j.topup; GRAM.bought=j.bought;
-    if(j.ungranted&&j.ungranted.length){ j.ungranted.forEach(u=>grantItem(u.item)); banner(T('Покупки выданы'),j.ungranted.length+' '+T('шт.'),1.6); gramAck(j.ungranted.map(u=>u.id)); }
+    if(j.ungranted&&j.ungranted.length){ const got=j.ungranted.map(u=>grantItem(u.item)).filter(Boolean), gift=j.ungranted.every(u=>u.gift);
+      SND.play('buy'); banner(gift?T('Подарок от администрации'):T('Покупки выданы'),got.length===1?got[0]:got.length+' '+T('шт.'),2.2); gramAck(j.ungranted.map(u=>u.id)); renderPanel(); }
   }catch(e){}
   gramHud(); if(S.tab==='shop'&&sheetOpen) renderPanel();
 }

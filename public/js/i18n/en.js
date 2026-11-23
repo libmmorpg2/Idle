@@ -669,5 +669,8 @@ I18N.en={
 "Пополнить": "Top up",
 "Паки": "Packs",
 "один раз": "one-time",
-"Куплено": "Bought"
+"Куплено": "Bought",
+"Подарок от администрации": "A gift from the administration",
+"вы заблокированы в чате": "you are banned from chat",
+"Админ-панель": "Admin panel"
 };

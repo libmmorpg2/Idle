@@ -1,7 +1,12 @@
 /* ---------- loop & boot ---------- */
 let last=0, hudAcc=0, panelAcc=0, saveAcc=0, errCount=0;
+// бой идёт только когда экран загрузки ушёл и герой выбран (иначе слышно атаки под заставкой)
+let GAME_RUN=false, LOADER_GONE=false;
+function gameRunCheck(){ const was=GAME_RUN; GAME_RUN=LOADER_GONE&&!PK.open&&typeof S!=='undefined'&&!!S; if(GAME_RUN&&!was) last=performance.now(); }
+window.addEventListener('loaderdone',()=>{ LOADER_GONE=true; gameRunCheck(); });
 function loop(now){
   requestAnimationFrame(loop);
+  if(!GAME_RUN){ last=now; try{ if(cv.height>=20&&cv.width>=20) draw(); hud(); }catch(e){} return; }
   let dt=(now-last)/1000; last=now;
   if(!(dt>=0)) dt=0;
   if(dt>8){ offlineReward(dt); dt=0; }
@@ -38,6 +43,7 @@ function start(data){
   if(typeof sndBtnSync==='function') sndBtnSync(); if(typeof SND!=='undefined') SND.apply();
   last=performance.now(); requestAnimationFrame(loop);
   chatStart(); friendsLoad(); gramHud(); gramLoad();
+  setInterval(()=>{ if(!document.hidden) gramLoad(); },60000);   // баланс GRAM и подарки от администрации
 }
 try{ window.claude?.hot?.snapshot?.(()=>({S})); }catch(e){}
 let started=false;

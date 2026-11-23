@@ -62,6 +62,7 @@ function renderPanel(){
       <div class="farmtog"><span><b>${T("Звуки")}</b><small>${T("Удары, выстрелы, заклинания, добыча")}</small></span><button class="sw ${sc.sfx?'on':''}" data-snd="sfx" role="switch" aria-checked="${!!sc.sfx}" aria-label="${T("Звуки")}"><i></i></button></div>
       <div class="farmtog"><span><b>${T("Музыка")}</b><small>${T("Спокойная тема в зонах, боевая в бою с боссом")}</small></span><button class="sw ${sc.mus?'on':''}" data-snd="mus" role="switch" aria-checked="${!!sc.mus}" aria-label="${T("Музыка")}"><i></i></button></div></div>`;
     h+=`<div class="frame ton"><div class="ftitle">${T("TON-кошелёк")}</div><div class="tonbox" id="tonBox"></div></div>`;
+    if(AUTH.user&&AUTH.user.admin) h+=`<a class="adm-link" href="/admin">🛠 ${T("Админ-панель")}</a>`;
     h+=`<div class="frame lang"><div class="ftitle">${T("Язык")}</div><div class="langs">${LANGS.map(l=>`<button type="button" data-lang="${l.id}" class="${l.id===LANG?'on':''}"><span>${l.flag}</span>${l.name}</button>`).join('')}</div></div>`;
       }
   }

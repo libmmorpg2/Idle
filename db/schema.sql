@@ -106,3 +106,6 @@ CREATE TABLE IF NOT EXISTS shop_purchases (
 );
 CREATE INDEX IF NOT EXISTS shop_purchases_player ON shop_purchases (tg_id, item);
 CREATE UNIQUE INDEX IF NOT EXISTS shop_purchases_once ON shop_purchases (tg_id, item) WHERE item = 'pack:starter';
+
+-- Бан в чате (ставит администратор).
+ALTER TABLE players ADD COLUMN IF NOT EXISTS chat_banned boolean NOT NULL DEFAULT false;

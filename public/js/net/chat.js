@@ -91,7 +91,7 @@ async function chatSend(){
     const body={text,hero:S.hero,lvl:S.lvl}; if(CHAT.ch) body.to=CHAT.ch; if(CHAT.reply) body.replyTo=CHAT.reply.id;
     const r=await api('chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
     if(r.ok){ chatMerge([(await r.json()).message]); inp.value=''; CHAT.reply=null; }
-    else chatNote(r.status===429?T('не так быстро'):r.status===403?T('игрок закрыл вам личные сообщения'):T('не отправлено'));
+    else { const er=await r.json().catch(()=>({})); chatNote(r.status===429?T('не так быстро'):er.error==='banned'?T('вы заблокированы в чате'):r.status===403?T('игрок закрыл вам личные сообщения'):T('не отправлено')); }
   }catch(e){ chatNote(T('не отправлено')); }
   CHAT.sending=false; chatRender(); if(keep) inp.focus();
 }
