@@ -8,7 +8,9 @@ function api(path,opts={}){
   const headers=Object.assign({},opts.headers||{}); if(AUTH.token) headers.Authorization='Bearer '+AUTH.token;
   return fetch('api/'+path,Object.assign({credentials:'same-origin',cache:'no-store'},opts,{headers}));
 }
+const REF_PARAM=new URLSearchParams(location.search).get('ref');   // приглашение по ссылке на сайт
 async function tgAuth(body){
+  if(REF_PARAM) body.ref=REF_PARAM;
   const r=await api('auth/telegram',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
   if(!r.ok) throw new Error(r.status===401?T('Telegram не подтвердил вход'):(T('сервер ответил')+' ')+r.status);
   const j=await r.json(); AUTH.token=j.token; AUTH.user=j.user; return j.user;

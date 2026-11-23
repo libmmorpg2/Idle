@@ -6,12 +6,20 @@ const express = require('express');
 const { Pool } = require('pg');
 const { verifyWebApp, verifyWidget } = require('./telegram');
 const chatRouter = require('./chat');
+const referralsModule = require('./referrals');
+const botModule = require('./bot');
 
 const env = process.env;
 const PORT = +env.PORT || 3000;
 const BOT_TOKEN = env.BOT_TOKEN;
 const BOT_USERNAME = (env.BOT_USERNAME || '').replace(/^@/, '');
 const SESSION_DAYS = 30;
+// Публичный адрес игры (https): нужен для webhook бота, кнопок «Играть» и манифеста TON Connect
+const PUBLIC_URL = (env.PUBLIC_URL || (env.RAILWAY_PUBLIC_DOMAIN ? `https://${env.RAILWAY_PUBLIC_DOMAIN}` : '')).replace(/\/$/, '');
+const TG_APP_URL = (env.TG_APP_URL || '').replace(/\/$/, '');
+// Реферальная ссылка: сразу в Mini App (если задан TG_APP_URL), иначе через /start в боте
+const refLink = id => TG_APP_URL ? `${TG_APP_URL}?startapp=ref_${id}`
+  : BOT_USERNAME ? `https://t.me/${BOT_USERNAME}?start=ref_${id}` : `${PUBLIC_URL}/?ref=${id}`;
 const COOKIE = 'sid';
 
 for (const k of ['DATABASE_URL', 'BOT_TOKEN']) {
@@ -56,6 +64,9 @@ function auth(req, res, next) {
   next();
 }
 
+const referrals = referralsModule(pool, { links: refLink });
+const bot = botModule({ token: BOT_TOKEN, publicUrl: PUBLIC_URL, apiBase: env.TELEGRAM_API_URL || 'https://api.telegram.org', referrals, links: refLink });
+
 /* ---------- приложение ---------- */
 const app = express();
 app.disable('x-powered-by');
@@ -63,7 +74,7 @@ app.set('trust proxy', 1);
 app.get('/healthz', (req, res) => res.send('ok'));
 // Манифест TON Connect: должен лежать на домене игры, поэтому собирается из адреса запроса
 app.get('/tonconnect-manifest.json', (req, res) => {
-  const origin = env.PUBLIC_URL ? env.PUBLIC_URL.replace(/\/$/, '') : `${req.protocol}://${req.get('host')}`;
+  const origin = PUBLIC_URL || `${req.protocol}://${req.get('host')}`;
   res.set('Access-Control-Allow-Origin', '*');
   res.json({ url: origin, name: 'Rampage: idle rpg', iconUrl: `${origin}/assets/img/icon-180.png` });
 });
@@ -72,7 +83,7 @@ const api = express.Router();
 api.use(express.json({ limit: '2mb' }));
 api.use((req, res, next) => { res.set('Cache-Control', 'no-store'); next(); });
 
-api.get('/config', (req, res) => res.json({ botUsername: BOT_USERNAME, tgAppUrl: env.TG_APP_URL || null }));
+api.get('/config', (req, res) => res.json({ botUsername: BOT_USERNAME, tgAppUrl: TG_APP_URL || null }));
 
 // TON-кошелёк: сохраняем адрес подключённого кошелька (null — отключён)
 api.post('/wallet', auth, async (req, res, next) => {
@@ -91,11 +102,13 @@ api.post('/auth/telegram', async (req, res, next) => {
     const u = b.initData ? verifyWebApp(b.initData, BOT_TOKEN) : verifyWidget(b.widget, BOT_TOKEN);
     if (!u) return res.status(401).json({ error: 'bad telegram signature' });
     const str = v => (typeof v === 'string' ? v.slice(0, 256) : null);
-    await pool.query(
+    const { rows } = await pool.query(
       `INSERT INTO players (tg_id, username, first_name, last_name, photo_url) VALUES ($1, $2, $3, $4, $5)
        ON CONFLICT (tg_id) DO UPDATE SET username = $2, first_name = $3, last_name = $4,
-         photo_url = COALESCE($5, players.photo_url), last_login = now()`,
+         photo_url = COALESCE($5, players.photo_url), last_login = now()
+       RETURNING (xmax = 0) AS inserted`,
       [u.id, str(u.username), str(u.first_name), str(u.last_name), str(u.photo_url)]);
+    if (rows[0].inserted) await referrals.onNewPlayer(u.id, u._startParam || b.ref).catch(e => console.error('referral:', e.message));
     const token = makeToken(u.id);
     res.cookie(COOKIE, token, { ...cookieOpts(req), maxAge: SESSION_DAYS * 86400 * 1000 });
     res.json({ token, user: { id: u.id, username: u.username || null, firstName: u.first_name || '' } });
@@ -134,12 +147,15 @@ api.put('/save', auth, async (req, res, next) => {
           `UPDATE player_saves SET state = $2, rev = rev + 1, updated_at = now()
            WHERE tg_id = $1 AND rev = $3 RETURNING rev`, [req.tgId, state, rev]);
     if (!rows[0]) return res.status(409).json({ error: 'conflict' });
+    referrals.onSave(req.tgId, state);
     res.json({ rev: rows[0].rev });
   } catch (e) { next(e); }
 });
 
 api.use('/chat', chatRouter(pool, auth));
+api.use('/friends', auth, referrals.router);
 app.use('/api', api);
+app.use('/tg/webhook', bot.router);
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
 app.use((err, req, res, next) => {
@@ -151,5 +167,5 @@ app.use((err, req, res, next) => {
 
 (async () => {
   await pool.query(fs.readFileSync(path.join(__dirname, '..', 'db', 'schema.sql'), 'utf8'));
-  app.listen(PORT, () => console.log(`Сервер слушает порт ${PORT}`));
+  app.listen(PORT, () => { console.log(`Сервер слушает порт ${PORT}`); if (env.BOT_WEBHOOK !== 'off') bot.setup(); });
 })().catch(e => { console.error('Не удалось подключиться к базе:', e.message); process.exit(1); });

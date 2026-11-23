@@ -11,6 +11,19 @@ Idle-RPG в браузере: canvas-бой, улучшения, умения, �
 - После входа сервер выдаёт подписанный токен сессии (30 дней): он хранится в памяти страницы
   и в httpOnly-куке `sid`.
 
+## Бот и друзья
+
+Сервер сам настраивает бота при запуске (нужен https-адрес: `PUBLIC_URL` или домен Railway):
+webhook `/tg/webhook` (проверяется секретом), команда `/start`, кнопка меню «Играть», описание бота.
+`/start` отвечает картинкой `assets/img/promo.jpg`, приветствием и кнопками «🎮 Играть» и «👥 Пригласить друзей».
+Отключить настройку бота: `BOT_WEBHOOK=off`.
+
+**Рефералы.** Ссылка игрока — `https://t.me/<бот>/<app>?startapp=ref_<id>` (если задан `TG_APP_URL`,
+открывает игру сразу) или `https://t.me/<бот>?start=ref_<id>` (через /start в боте). Засчитываются
+только новые игроки. Награды в осколках души (`server/referrals.js`, `REWARD`):
++5 пригласившему за друга, +3 другу за вход, +10 пригласившему, когда друг достигнет 10 уровня.
+Забираются в профиле → «Друзья». Таблицы: `referrals`, `referral_pending`, `referral_rewards`.
+
 ## Языки
 
 Русский и английский. Язык выбирается в профиле (сохраняется в куке `lang`), по умолчанию —
@@ -55,8 +68,8 @@ Idle-RPG в браузере: canvas-бой, улучшения, умения, �
    | `BOT_TOKEN`      | токен бота от @BotFather |
    | `BOT_USERNAME`   | имя бота без `@` (нужно для кнопки входа на сайте) |
    | `SESSION_SECRET` | необязательно, любая длинная случайная строка |
+   | `PUBLIC_URL`     | необязательно: адрес игры (`https://…`). На Railway берётся сам из `RAILWAY_PUBLIC_DOMAIN` |
    | `TG_APP_URL`     | необязательно: ссылка на Mini App (`https://t.me/<бот>/<app>`) — куда TON-кошелёк вернёт игрока после подтверждения |
-   | `PUBLIC_URL`     | необязательно: адрес игры для манифеста TON Connect, если он отличается от адреса запроса |
 
    `PORT` Railway задаёт сам. SSL к базе включается автоматически для публичного адреса
    и выключается для внутреннего `*.railway.internal` (можно задать явно: `DATABASE_SSL=true|false`).
@@ -87,6 +100,8 @@ npm start                   # http://localhost:3000
 |-------|----------------------|----------|
 | POST  | `/api/auth/telegram` | `{ initData }` (Mini App) или `{ widget: {...} }` (Login Widget) → `{ token, user }` |
 | GET   | `/api/me`            | текущий пользователь |
+| GET   | `/api/friends`       | реферальная ссылка, друзья, награды |
+| POST  | `/api/friends/claim` | забрать награды → `{ stones }` |
 | POST  | `/api/wallet`        | `{ address }` — адрес TON-кошелька или `null` |
 | GET   | `/tonconnect-manifest.json` | манифест TON Connect |
 | POST  | `/api/logout`        | выход (сбрасывает куку) |
@@ -105,6 +120,8 @@ npm start                   # http://localhost:3000
 server/index.js         сервер: раздаёт public/, вход и API сохранений
 server/telegram.js      проверка подписи данных Telegram
 server/chat.js          API общего чата
+server/referrals.js     реферальная система
+server/bot.js           Telegram-бот: webhook, /start, меню
 db/schema.sql           схема таблиц players, player_saves, chat_messages, chat_blocks
 public/index.html       разметка + подключение стилей и скриптов
 public/css/style.css    все стили
@@ -120,6 +137,7 @@ public/js/
   ui/                   HUD, сумка, локации, навигация, магазин, панель, выбор героя
   net/chat.js           общий чат (сообщения на сервере, опрос раз в 2,5–5 с)
   net/ton.js            подключение TON-кошелька
+  net/friends.js        профиль → «Друзья»
   i18n/                 языки: T(), словарь en.js
   splash/splash.js      анимированная заставка при загрузке
   main.js               игровой цикл и старт

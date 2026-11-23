@@ -44,3 +44,28 @@ CREATE TABLE IF NOT EXISTS chat_blocks (
 
 -- Подключённый TON-кошелёк (адрес в user-friendly формате, без проверки владения).
 ALTER TABLE players ADD COLUMN IF NOT EXISTS ton_address text;
+
+-- Рефералы: кто кого пригласил (только новые игроки).
+CREATE TABLE IF NOT EXISTS referrals (
+  invitee_id  bigint      PRIMARY KEY REFERENCES players (tg_id) ON DELETE CASCADE,
+  referrer_id bigint      NOT NULL REFERENCES players (tg_id) ON DELETE CASCADE,
+  created_at  timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS referrals_referrer ON referrals (referrer_id);
+-- Приглашение из /start в боте, пока игрок ещё не открыл игру.
+CREATE TABLE IF NOT EXISTS referral_pending (
+  tg_id       bigint      PRIMARY KEY,
+  referrer_id bigint      NOT NULL,
+  created_at  timestamptz NOT NULL DEFAULT now()
+);
+-- Награды за друзей (осколки души); забираются в профиле → «Друзья».
+CREATE TABLE IF NOT EXISTS referral_rewards (
+  id         bigserial   PRIMARY KEY,
+  tg_id      bigint      NOT NULL REFERENCES players (tg_id) ON DELETE CASCADE,
+  reason     text        NOT NULL,           -- join | welcome | lvl10
+  ref_id     bigint      NOT NULL,           -- второй участник
+  stones     integer     NOT NULL,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  claimed_at timestamptz,
+  UNIQUE (tg_id, reason, ref_id)
+);

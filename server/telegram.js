@@ -29,6 +29,7 @@ function verifyWebApp(initData, botToken) {
   if (!safeEqHex(calc, hash) || !fresh(p.get('auth_date'))) return null;
   try {
     const u = JSON.parse(p.get('user'));
+    if (u && Number.isSafeInteger(u.id)) u._startParam = p.get('start_param');   // ?startapp=… из ссылки на Mini App
     return u && Number.isSafeInteger(u.id) ? u : null;
   } catch { return null; }
 }

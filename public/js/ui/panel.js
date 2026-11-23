@@ -54,17 +54,21 @@ function renderPanel(){
   } else {
   }
   if(tab==='profile'){
+    h+=`<div class="ptabs"><button type="button" data-ptab="set" class="${PTAB==='set'?'on':''}">⚙ ${T("Настройки")}</button><button type="button" data-ptab="friends" class="${PTAB==='friends'?'on':''}">👥 ${T("Друзья")}<i ${FRND.data&&FRND.data.pending?'':'hidden'}></i></button></div>`;
+    if(PTAB==='friends') h+=`<div id="friendsBox"></div>`;
+    else {
     const sc=S.snd||{sfx:true,mus:true};
     h+=`<div class="frame snd"><div class="ftitle">${T("Звук")}</div>
       <div class="farmtog"><span><b>${T("Звуки")}</b><small>${T("Удары, выстрелы, заклинания, добыча")}</small></span><button class="sw ${sc.sfx?'on':''}" data-snd="sfx" role="switch" aria-checked="${!!sc.sfx}" aria-label="${T("Звуки")}"><i></i></button></div>
       <div class="farmtog"><span><b>${T("Музыка")}</b><small>${T("Спокойная тема в зонах, боевая в бою с боссом")}</small></span><button class="sw ${sc.mus?'on':''}" data-snd="mus" role="switch" aria-checked="${!!sc.mus}" aria-label="${T("Музыка")}"><i></i></button></div></div>`;
     h+=`<div class="frame ton"><div class="ftitle">${T("TON-кошелёк")}</div><div class="tonbox" id="tonBox"></div></div>`;
     h+=`<div class="frame lang"><div class="ftitle">${T("Язык")}</div><div class="langs">${LANGS.map(l=>`<button type="button" data-lang="${l.id}" class="${l.id===LANG?'on':''}"><span>${l.flag}</span>${l.name}</button>`).join('')}</div></div>`;
+      }
   }
   list.innerHTML=h;
   if(tab==='map') afterMap();
   if(tab==='skill' && imgReady) SK.forEach((s,i)=>frameThumb($('ti'+i),s.who,s.icon[0],s.icon[1]));
-  if(tab==='profile') tonMount();
+  if(tab==='profile'){ if(PTAB==='friends'){ friendsRender(); friendsLoad(); } else tonMount(); }
   panelTick();
 }
 function panelTick(){
