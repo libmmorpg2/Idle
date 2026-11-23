@@ -41,3 +41,6 @@ CREATE TABLE IF NOT EXISTS chat_blocks (
   created_at timestamptz NOT NULL DEFAULT now(),
   PRIMARY KEY (tg_id, blocked_id)
 );
+
+-- Подключённый TON-кошелёк (адрес в user-friendly формате, без проверки владения).
+ALTER TABLE players ADD COLUMN IF NOT EXISTS ton_address text;

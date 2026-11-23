@@ -61,12 +61,28 @@ const app = express();
 app.disable('x-powered-by');
 app.set('trust proxy', 1);
 app.get('/healthz', (req, res) => res.send('ok'));
+// Манифест TON Connect: должен лежать на домене игры, поэтому собирается из адреса запроса
+app.get('/tonconnect-manifest.json', (req, res) => {
+  const origin = env.PUBLIC_URL ? env.PUBLIC_URL.replace(/\/$/, '') : `${req.protocol}://${req.get('host')}`;
+  res.set('Access-Control-Allow-Origin', '*');
+  res.json({ url: origin, name: 'Rampage: idle rpg', iconUrl: `${origin}/assets/img/icon-180.png` });
+});
 
 const api = express.Router();
 api.use(express.json({ limit: '2mb' }));
 api.use((req, res, next) => { res.set('Cache-Control', 'no-store'); next(); });
 
-api.get('/config', (req, res) => res.json({ botUsername: BOT_USERNAME }));
+api.get('/config', (req, res) => res.json({ botUsername: BOT_USERNAME, tgAppUrl: env.TG_APP_URL || null }));
+
+// TON-кошелёк: сохраняем адрес подключённого кошелька (null — отключён)
+api.post('/wallet', auth, async (req, res, next) => {
+  try {
+    const a = (req.body || {}).address;
+    if (a !== null && !(typeof a === 'string' && /^[A-Za-z0-9_-]{48}$/.test(a))) return res.status(400).json({ error: 'bad address' });
+    await pool.query('UPDATE players SET ton_address = $2 WHERE tg_id = $1', [req.tgId, a]);
+    res.json({ ok: true });
+  } catch (e) { next(e); }
+});
 
 // Вход: { initData } из Mini App или { widget: {...} } из Telegram Login Widget.
 api.post('/auth/telegram', async (req, res, next) => {

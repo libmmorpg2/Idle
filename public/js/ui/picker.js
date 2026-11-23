@@ -1,6 +1,6 @@
 // ---- hero picker: tarot cards ----
-const HEROES_ROLE={mage:'Маг',tank:'Танк',asn:'Убийца',sam:'Стрелок'};
-const PK_RATE_N=['Атака','Защита','Скорость','Дальность'];
+const HEROES_ROLE={mage:T('Маг'),tank:T('Танк'),asn:T('Убийца'),sam:T('Стрелок')};
+const PK_RATE_N=[T('Атака'),T('Защита'),T('Скорость'),T('Дальность')];
 const PK={open:false,idx:0,pos:0,drag:null,sel:{},raf:0,t0:0,first:false,tmp:null};
 const PK_IDS=()=>Object.keys(HEROES);
 function withHero(id,fn){ const s={h:S.hero,HD,SK,FR,sk:S.sk}; S.hero=id; HD=HEROES[id]; SK=SKS[id]; FR=FRS[id]; S.sk=S.sks[id];
@@ -9,19 +9,19 @@ function pkRender(){
   const ids=PK_IDS(), id=ids[PK.idx], hd=HEROES[id], sel=PK.sel[id]||0;
   const statsOf=h2=>withHero(h2,()=>{ const b=buff.power; buff.power=0; const r={atk:st.atk(),aps:st.aps(),hp:st.maxHp(),crit:st.crit(),cm:st.critM(),bm:calcBM()}; buff.power=b; return r; });
   const v=statsOf(id), hb=heroBase(id);
-  const rate=(HERO_RATE[id]||[3,3,3,3]).map((n,i)=>`<div><span>${PK_RATE_N[i]}</span><span class="pk-pips" aria-label="${n} из 5">${[0,1,2,3,4].map(j=>`<i class="${j<n?'on':''}"></i>`).join('')}</span></div>`).join('');
+  const rate=(HERO_RATE[id]||[3,3,3,3]).map((n,i)=>`<div><span>${PK_RATE_N[i]}</span><span class="pk-pips" aria-label="${n} ${T("из 5")}">${[0,1,2,3,4].map(j=>`<i class="${j<n?'on':''}"></i>`).join('')}</span></div>`).join('');
   const sks=SKS[id].map((s,i)=>`<button class="pk-sk ${i===sel?'on':''} ${S.lvl<s.unlock?'lock':''}" data-pks="${i}" aria-label="${s.name}"><canvas width="64" height="64"></canvas></button>`).join('');
   const s=SKS[id][sel], lv=(S.sks[id]||[])[sel]||1;
   $('pkInfo').innerHTML=`<h2>${hd.name}</h2>
-    <p class="pk-role">${HEROES_ROLE[id]||''}, ${hd.melee?'ближний бой':'дальний бой'}${id===S.hero&&S.picked?' — сейчас в бою':''}</p>
+    <p class="pk-role">${HEROES_ROLE[id]||''}, ${hd.melee?T('ближний бой'):T('дальний бой')}${id===S.hero&&S.picked?(' '+T('— сейчас в бою')):''}</p>
     <p class="pk-desc">${hd.desc}</p>
     <div class="pk-rate">${rate}</div>
-    <p class="pk-nums">Боевая мощь <b>${fmt(v.bm)}</b>&nbsp;&nbsp; Урон <b>${fmt(v.atk)}</b>&nbsp;&nbsp; Здоровье <b>${fmt(v.hp)}</b><br>Атак в секунду <b>${v.aps.toFixed(2)}</b>&nbsp;&nbsp; Крит <b>${Math.round(v.crit*100)}%</b>&nbsp;&nbsp; Сила крита <b>x${v.cm.toFixed(2)}</b>${hb.def?`&nbsp;&nbsp; Броня <b>${Math.round(hb.def*100)}%</b>`:''}</p>
+    <p class="pk-nums">${T("Боевая мощь")} <b>${fmt(v.bm)}</b>${T("&nbsp;&nbsp; Урон")} <b>${fmt(v.atk)}</b>${T("&nbsp;&nbsp; Здоровье")} <b>${fmt(v.hp)}</b><br>${T("Атак в секунду")} <b>${v.aps.toFixed(2)}</b>${T("&nbsp;&nbsp; Крит")} <b>${Math.round(v.crit*100)}%</b>${T("&nbsp;&nbsp; Сила крита")} <b>x${v.cm.toFixed(2)}</b>${hb.def?`${T("&nbsp;&nbsp; Броня")} <b>${Math.round(hb.def*100)}%</b>`:''}</p>
     <div class="pk-sks">${sks}</div>
-    <p class="pk-skinfo"><b>${s.name}.</b> ${s.info(lv)}<small>Перезарядка ${s.cd} с, открывается на ${s.unlock} уровне</small></p>
-    <p class="pk-psv">Пассивные: ${PSV[id].map(p=>p.name).join(', ')}</p>`;
+    <p class="pk-skinfo"><b>${s.name}.</b> ${s.info(lv)}<small>${T("Перезарядка")} ${s.cd} ${T("с, открывается на")} ${s.unlock} ${T("уровне")}</small></p>
+    <p class="pk-psv">${T("Пассивные:")} ${PSV[id].map(p=>p.name).join(', ')}</p>`;
   if(imgReady) $('pkInfo').querySelectorAll('[data-pks]').forEach(b=>{ const k=+b.dataset.pks, sk=SKS[id][k]; frameThumb(b.querySelector('canvas'),id,sk.icon[0],sk.icon[1]); });
-  const go=$('pkGo'), cur=id===S.hero&&S.picked; go.classList.toggle('cur',cur); go.textContent=cur?'Вернуться в бой':'Выбрать героя';
+  const go=$('pkGo'), cur=id===S.hero&&S.picked; go.classList.toggle('cur',cur); go.textContent=cur?T('Вернуться в бой'):T('Выбрать героя');
 }
 function pkSetIdx(k){ const n=PK_IDS().length; k=((k%n)+n)%n; if(k===PK.idx) return; PK.idx=k; PK.t0=performance.now(); PK.sw=performance.now();
   const el=$('pkInfo'); if(matchMedia('(prefers-reduced-motion: reduce)').matches){ pkRender(); return; }

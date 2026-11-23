@@ -1,23 +1,23 @@
 const PETS=[
- {id:'hound',name:'Боевой пёс',rar:0,buff:{gold:5},col:'#ffb070',price:2000},
- {id:'boar',name:'Бронекабан',rar:0,buff:{hp:6},col:'#d8a080',price:2500},
- {id:'bat',name:'Ночная мышь',rar:0,fly:1,buff:{xp:5},col:'#c87aa8',price:3000},
- {id:'fairy',name:'Лесная фея',rar:1,fly:1,buff:{xp:12,regen:0.3},col:'#a8f08a',price:12000},
- {id:'wolf',name:'Волк в латах',rar:1,buff:{crit:3},col:'#c8d0e0',price:14000},
- {id:'imp',name:'Бесёнок',rar:1,fly:1,buff:{dmg:5},col:'#ff7a4a',price:15000},
- {id:'direwolf',name:'Лютоволк',rar:2,buff:{dmg:8,hp:8},col:'#5ff0ff',price:60000},
- {id:'griffin',name:'Грифон',rar:2,buff:{aps:8,gold:10},col:'#ffd070',price:70000},
- {id:'wisp',name:'Огненный дух',rar:2,fly:1,buff:{aps:10},col:'#ffb04a',price:80000},
- {id:'dragon',name:'Кристальный дракон',rar:3,fly:1,buff:{dmg:12,crit:3},col:'#7ad8ff',price:300000},
- {id:'icefairy',name:'Ледяная фея',rar:3,fly:1,buff:{hp:15,regen:0.5},col:'#bff0ff',price:320000},
- {id:'jaguar',name:'Теневой ягуар',rar:3,buff:{aps:12,crit:3},col:'#c87aff',price:350000},
- {id:'succubus',name:'Суккуба',rar:4,fly:1,buff:{dmg:18,aps:8},col:'#ff5aa8',price:1200000},
- {id:'ghostwolf',name:'Призрачный волк',rar:4,map:'direwolf',buff:{dmg:15,crit:5},col:'#8fe8ff',price:1300000},
- {id:'unicorn',name:'Боевой единорог',rar:4,buff:{hp:20,regen:1},col:'#e0b0ff',price:1400000},
- {id:'phoenix',name:'Феникс',rar:5,fly:1,buff:{dmg:25,regen:1.5},col:'#ff7a2a',price:5000000},
- {id:'ancient',name:'Древний дракон',rar:5,fly:1,buff:{dmg:30,crit:5,gold:20},col:'#ff4a2a',price:6000000},
+ {id:'hound',name:T('Боевой пёс'),rar:0,buff:{gold:5},col:'#ffb070',price:2000},
+ {id:'boar',name:T('Бронекабан'),rar:0,buff:{hp:6},col:'#d8a080',price:2500},
+ {id:'bat',name:T('Ночная мышь'),rar:0,fly:1,buff:{xp:5},col:'#c87aa8',price:3000},
+ {id:'fairy',name:T('Лесная фея'),rar:1,fly:1,buff:{xp:12,regen:0.3},col:'#a8f08a',price:12000},
+ {id:'wolf',name:T('Волк в латах'),rar:1,buff:{crit:3},col:'#c8d0e0',price:14000},
+ {id:'imp',name:T('Бесёнок'),rar:1,fly:1,buff:{dmg:5},col:'#ff7a4a',price:15000},
+ {id:'direwolf',name:T('Лютоволк'),rar:2,buff:{dmg:8,hp:8},col:'#5ff0ff',price:60000},
+ {id:'griffin',name:T('Грифон'),rar:2,buff:{aps:8,gold:10},col:'#ffd070',price:70000},
+ {id:'wisp',name:T('Огненный дух'),rar:2,fly:1,buff:{aps:10},col:'#ffb04a',price:80000},
+ {id:'dragon',name:T('Кристальный дракон'),rar:3,fly:1,buff:{dmg:12,crit:3},col:'#7ad8ff',price:300000},
+ {id:'icefairy',name:T('Ледяная фея'),rar:3,fly:1,buff:{hp:15,regen:0.5},col:'#bff0ff',price:320000},
+ {id:'jaguar',name:T('Теневой ягуар'),rar:3,buff:{aps:12,crit:3},col:'#c87aff',price:350000},
+ {id:'succubus',name:T('Суккуба'),rar:4,fly:1,buff:{dmg:18,aps:8},col:'#ff5aa8',price:1200000},
+ {id:'ghostwolf',name:T('Призрачный волк'),rar:4,map:'direwolf',buff:{dmg:15,crit:5},col:'#8fe8ff',price:1300000},
+ {id:'unicorn',name:T('Боевой единорог'),rar:4,buff:{hp:20,regen:1},col:'#e0b0ff',price:1400000},
+ {id:'phoenix',name:T('Феникс'),rar:5,fly:1,buff:{dmg:25,regen:1.5},col:'#ff7a2a',price:5000000},
+ {id:'ancient',name:T('Древний дракон'),rar:5,fly:1,buff:{dmg:30,crit:5,gold:20},col:'#ff4a2a',price:6000000},
 ];
-const PB_TXT={dmg:['Урон','%'],hp:['Здоровье','%'],aps:['Скорость атаки','%'],crit:['Шанс крита','%'],gold:['Золото','%'],xp:['Опыт','%'],regen:['Регенерация','%/с'],luck:['Удача (трофеи)','%']};
+const PB_TXT={dmg:[T('Урон'),'%'],hp:[T('Здоровье'),'%'],aps:[T('Скорость атаки'),'%'],crit:[T('Шанс крита'),'%'],gold:[T('Золото'),'%'],xp:[T('Опыт'),'%'],regen:[T('Регенерация'),T('%/с')],luck:[T('Удача (трофеи)'),'%']};
 const petDef=()=>S.pets&&S.pets.act?PETS.find(p=>p.id===S.pets.act):null;
 const petB=k=>{ const P=petDef(), C=capeDef(); return (P&&P.buff[k]||0)+(C&&C.buff[k]||0); };
 const petFlies=P=>!!P.fly;

@@ -10,14 +10,14 @@ const EMBLEM={
  sun:["e.e.e",".eee.","eeEee",".eee.","e.e.e"],
 };
 const CAPES=[
- {id:'travel',name:'Дорожный плащ',rar:0,buff:{hp:5},m:'#7a5a3a',h:'#a07a52',M:'#4e3820',t:'#8a8a8a',T:'#5a5a5a',g:'#c8c8c8',em:null,price:3000},
- {id:'ranger',name:'Плащ следопыта',rar:1,buff:{crit:2,gold:5},m:'#3f7a3a',h:'#5fa35a',M:'#2a5226',t:'#b0b0ba',T:'#73737e',g:'#5fd39b',em:'leaf',price:15000},
- {id:'crimson',name:'Багровый плащ',rar:2,buff:{dmg:6},m:'#9a1e22',h:'#c83a3a',M:'#5c1014',t:'#e0b040',T:'#9a6a20',g:'#ff5a3a',em:'flame',price:80000},
- {id:'frost',name:'Плащ вечной зимы',rar:3,buff:{hp:15,regen:0.5},m:'#2a6a9a',h:'#4a9ac8',M:'#183e60',t:'#e8f4ff',T:'#8ab0d0',g:'#8fe8ff',em:'snow',price:350000},
- {id:'archmage',name:'Плащ архимага',rar:3,buff:{dmg:10,aps:5},m:'#4a2a8a',h:'#7050c0',M:'#2a1458',t:'#e8c050',T:'#a07020',g:'#c46bff',em:'star',price:400000},
- {id:'shadow',name:'Покров тени',rar:4,buff:{crit:5,aps:12},m:'#2a2238',h:'#4a3e62',M:'#141020',t:'#b070ff',T:'#6a3aa8',g:'#d58cff',em:'eye',price:1500000},
- {id:'dragonslayer',name:'Плащ драконоборца',rar:4,buff:{dmg:15,hp:10},m:'#3a1a1a',h:'#6a2a22',M:'#1a0a0a',t:'#f0c858',T:'#a87420',g:'#ff5a2a',em:'wings',price:1800000},
- {id:'celestial',name:'Мантия небожителя',rar:5,buff:{dmg:20,aps:10,gold:15},m:'#e8e4fa',h:'#ffffff',M:'#aaa2d0',t:'#f4d870',T:'#b08830',g:'#5ff0ff',em:'sun',price:7000000},
+ {id:'travel',name:T('Дорожный плащ'),rar:0,buff:{hp:5},m:'#7a5a3a',h:'#a07a52',M:'#4e3820',t:'#8a8a8a',T:'#5a5a5a',g:'#c8c8c8',em:null,price:3000},
+ {id:'ranger',name:T('Плащ следопыта'),rar:1,buff:{crit:2,gold:5},m:'#3f7a3a',h:'#5fa35a',M:'#2a5226',t:'#b0b0ba',T:'#73737e',g:'#5fd39b',em:'leaf',price:15000},
+ {id:'crimson',name:T('Багровый плащ'),rar:2,buff:{dmg:6},m:'#9a1e22',h:'#c83a3a',M:'#5c1014',t:'#e0b040',T:'#9a6a20',g:'#ff5a3a',em:'flame',price:80000},
+ {id:'frost',name:T('Плащ вечной зимы'),rar:3,buff:{hp:15,regen:0.5},m:'#2a6a9a',h:'#4a9ac8',M:'#183e60',t:'#e8f4ff',T:'#8ab0d0',g:'#8fe8ff',em:'snow',price:350000},
+ {id:'archmage',name:T('Плащ архимага'),rar:3,buff:{dmg:10,aps:5},m:'#4a2a8a',h:'#7050c0',M:'#2a1458',t:'#e8c050',T:'#a07020',g:'#c46bff',em:'star',price:400000},
+ {id:'shadow',name:T('Покров тени'),rar:4,buff:{crit:5,aps:12},m:'#2a2238',h:'#4a3e62',M:'#141020',t:'#b070ff',T:'#6a3aa8',g:'#d58cff',em:'eye',price:1500000},
+ {id:'dragonslayer',name:T('Плащ драконоборца'),rar:4,buff:{dmg:15,hp:10},m:'#3a1a1a',h:'#6a2a22',M:'#1a0a0a',t:'#f0c858',T:'#a87420',g:'#ff5a2a',em:'wings',price:1800000},
+ {id:'celestial',name:T('Мантия небожителя'),rar:5,buff:{dmg:20,aps:10,gold:15},m:'#e8e4fa',h:'#ffffff',M:'#aaa2d0',t:'#f4d870',T:'#b08830',g:'#5ff0ff',em:'sun',price:7000000},
 ];
 const capeDef=()=>S.capes&&S.capes.act?CAPES.find(c=>c.id===S.capes.act):null;
 const capeIcCache={};

@@ -33,13 +33,13 @@ async function flushSave(urgent){
   const body=JSON.stringify({state:S,rev:SRV.rev});
   try{
     const r=await api('save',{method:'PUT',headers:{'Content-Type':'application/json'},body,keepalive:!!urgent&&body.length<60000});
-    if(r.status===401){ SRV.dead=true; srvMsg('Сессия истекла. Обновите страницу и войдите снова.'); return; }
-    if(r.status===409){ SRV.dead=true; srvMsg('Игра открыта в другой вкладке или на другом устройстве. Обновите страницу — здесь прогресс больше не сохраняется.'); return; }
+    if(r.status===401){ SRV.dead=true; srvMsg(T('Сессия истекла. Обновите страницу и войдите снова.')); return; }
+    if(r.status===409){ SRV.dead=true; srvMsg(T('Игра открыта в другой вкладке или на другом устройстве. Обновите страницу — здесь прогресс больше не сохраняется.')); return; }
     if(!r.ok) throw new Error('HTTP '+r.status);
     SRV.rev=(await r.json()).rev;
     if(SRV.netErr){ SRV.netErr=false; srvMsg(''); }
   }catch(e){
-    SRV.dirty=true; SRV.netErr=true; srvMsg('Нет связи с сервером — прогресс не сохранён, повторяю…');
+    SRV.dirty=true; SRV.netErr=true; srvMsg(T('Нет связи с сервером — прогресс не сохранён, повторяю…'));
     SRV.retry=setTimeout(flushSave,3000);
   }finally{ SRV.busy=false; }
   if(SRV.dirty&&!SRV.netErr) flushSave();
@@ -47,11 +47,11 @@ async function flushSave(urgent){
 async function fetchSave(){   // ждёт сервер, пока не ответит: без загрузки нельзя начинать, иначе затрём прогресс
   for(;;){
     try{
-      LOAD.set(70,'Загружаем сохранение…');
+      LOAD.set(70,T('Загружаем сохранение…'));
       const r=await api('save');
       if(r.status===401){ location.reload(); await new Promise(()=>{}); }
       if(!r.ok) throw new Error('HTTP '+r.status);
       const j=await r.json(); SRV.rev=j.rev|0; srvMsg(''); return j.state;
-    }catch(e){ srvMsg('Не удалось загрузить сохранение с сервера, повторяю…'); await new Promise(f=>setTimeout(f,3000)); }
+    }catch(e){ srvMsg(T('Не удалось загрузить сохранение с сервера, повторяю…')); await new Promise(f=>setTimeout(f,3000)); }
   }
 }

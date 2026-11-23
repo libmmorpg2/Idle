@@ -8,17 +8,17 @@ function stackList(){
 }
 const bagUsed=()=>S.inv.bag.length+stackList().length+ownLoose().length;
 function stackInfo(st){
-  if(st.id==='stone') return {img:STONE_ICON,name:'Осколок души',col:'#7af0ff',r:2,desc:'Нужен для улучшения характеристик с 5-го уровня во вкладке «Герой». Цена удваивается с каждым уровнем: 1, 2, 4, 8…'};
-  if(st.id==='scr0') return {img:scrollIcon(0),name:'Свиток заточки',col:'#ffd27a',r:4,desc:'Заточка вещи: открой вещь и нажми «Заточить». При провале вещь сгорает.'};
-  if(st.id==='scr1') return {img:scrollIcon(1),name:'Безопасный свиток',col:'#5ff0ff',r:5,desc:'Заточка вещи без риска: при провале заточка снижается на 1, вещь остаётся.'};
-  return {img:bookIcon(st.c,st.k),name:'Книга: '+bookName(st.c,st.k),col:'#f3d27a',r:3,cls:st.c,desc:`Изучает навык «${bookName(st.c,st.k)}» для класса ${HEROES[st.c].name}.`};
+  if(st.id==='stone') return {img:STONE_ICON,name:T('Осколок души'),col:'#7af0ff',r:2,desc:T('Нужен для улучшения характеристик с 5-го уровня во вкладке «Герой». Цена удваивается с каждым уровнем: 1, 2, 4, 8…')};
+  if(st.id==='scr0') return {img:scrollIcon(0),name:T('Свиток заточки'),col:'#ffd27a',r:4,desc:T('Заточка вещи: открой вещь и нажми «Заточить». При провале вещь сгорает.')};
+  if(st.id==='scr1') return {img:scrollIcon(1),name:T('Безопасный свиток'),col:'#5ff0ff',r:5,desc:T('Заточка вещи без риска: при провале заточка снижается на 1, вещь остаётся.')};
+  return {img:bookIcon(st.c,st.k),name:(T('Книга:')+' ')+bookName(st.c,st.k),col:'#f3d27a',r:3,cls:st.c,desc:`${T("Изучает навык «")}${bookName(st.c,st.k)}${T("» для класса")} ${HEROES[st.c].name}.`};
 }
 function openStack(id){
   const st=stackList().find(x=>x.id===id); if(!st) return; const inf=stackInfo(st), md=$('modal');
   let act='';
   if(st.c){ const own=st.c===S.hero, learned=isL(st.c,st.k), need=st.k[0]==='a'?SKS[st.c][+st.k.slice(1)].unlock:PSV[st.c].find(p=>'p'+p.id===st.k).unlock;
-    act= learned?`<button disabled>Уже изучено</button>`: !own?`<button disabled>Только для: ${HEROES[st.c].name}</button>`: S.lvl<need?`<button disabled>Нужен уровень ${need}</button>`:`<button id="stUse">Изучить</button>`; }
-  md.innerHTML=`<div class="card item-card"><div class="ic"><img src="${inf.img}" alt=""></div><h2 style="color:${inf.col}">${inf.name}</h2><p>В сумке: <b style="color:var(--fg)">×${st.n}</b></p>${inf.cls?`<p class="cls" style="color:${CLS_COL[inf.cls]}">Класс: ${HEROES[inf.cls].name}</p>`:''}<p>${inf.desc}</p><div class="ibtn">${act}<button id="stClose" class="sec-btn">Закрыть</button></div></div>`;
+    act= learned?`<button disabled>${T("Уже изучено")}</button>`: !own?`<button disabled>${T("Только для:")} ${HEROES[st.c].name}</button>`: S.lvl<need?`<button disabled>${T("Нужен уровень")} ${need}</button>`:`<button id="stUse">${T("Изучить")}</button>`; }
+  md.innerHTML=`<div class="card item-card"><div class="ic"><img src="${inf.img}" alt=""></div><h2 style="color:${inf.col}">${inf.name}</h2><p>${T("В сумке:")} <b style="color:var(--fg)">×${st.n}</b></p>${inf.cls?`<p class="cls" style="color:${CLS_COL[inf.cls]}">${T("Класс:")} ${HEROES[inf.cls].name}</p>`:''}<p>${inf.desc}</p><div class="ibtn">${act}<button id="stClose" class="sec-btn">${T("Закрыть")}</button></div></div>`;
   md.hidden=false; const close=()=>{ md.hidden=true; renderPanel(); };
   $('stClose').onclick=close; md.onclick=e=>{ if(e.target===md) close(); };
   if($('stUse')) $('stUse').onclick=()=>{ learnKey(st.k); close(); };
@@ -59,14 +59,14 @@ const SCR_PCT=[0.1,0.01]; // % per kill: normal, safe
 function dropStone(e){
   if(Math.random()<stoneChance(S.zone)*(e.boss?BOSS_MULT:1)*(1+petB('luck')/100)){
     S.stones=(S.stones||0)+1;
-    floats.push({x:e.x,y:enemyTop(e)-54,text:'Осколок души',col:'#7af0ff',size:10,life:1.6,vy:-18});
+    floats.push({x:e.x,y:enemyTop(e)-54,text:T('Осколок души'),col:'#7af0ff',size:10,life:1.6,vy:-18});
     for(let i=0;i<10;i++) parts.push({x:e.x,y:enemyY(e)-6,vx:rnd(-30,30),vy:rnd(-90,-40),life:rnd(.5,.9),max:.9,col:i%2?'#7af0ff':'#3a8aff',s:1.5,g:160});
   }
 }
 function dropScroll(e){
   for(let k=1;k>=0;k--){ if(Math.random()<SCR_PCT[k]/100*(e.boss?BOSS_MULT:1)*(1+petB('luck')/100)){
     S.inv.scr[k?'s':'n']++;
-    floats.push({x:e.x,y:enemyTop(e)-42,text:k?'Безопасный свиток':'Свиток заточки',col:k?'#5ff0ff':'#ffd27a',size:10,life:1.6,vy:-18});
+    floats.push({x:e.x,y:enemyTop(e)-42,text:k?T('Безопасный свиток'):T('Свиток заточки'),col:k?'#5ff0ff':'#ffd27a',size:10,life:1.6,vy:-18});
     for(let i=0;i<10;i++) parts.push({x:e.x,y:enemyY(e)-6,vx:rnd(-30,30),vy:rnd(-90,-40),life:rnd(.5,.9),max:.9,col:k?'#5ff0ff':'#ffd27a',s:1.5,g:160});
     if(sheetOpen && S.tab==='bag') renderPanel();
     return; } }
@@ -78,8 +78,8 @@ function dropBook(e){
   const want=keys.filter(k=>!isL(c,k)); const pool=want.length?want:keys;
   const key=pool[Math.floor(Math.random()*pool.length)];
   S.books[c][key]=(S.books[c][key]||0)+1;
-  banner('Книга навыка!',`${HEROES[c].name}: ${bookName(c,key)}`,2.4);
-  floats.push({x:e.x,y:enemyTop(e)-66,text:'Книга: '+bookName(c,key),col:'#f3d27a',size:11,life:2,vy:-16});
+  banner(T('Книга навыка!'),`${HEROES[c].name}: ${bookName(c,key)}`,2.4);
+  floats.push({x:e.x,y:enemyTop(e)-66,text:(T('Книга:')+' ')+bookName(c,key),col:'#f3d27a',size:11,life:2,vy:-16});
   for(let i=0;i<24;i++) parts.push({x:e.x,y:enemyY(e)-6,vx:rnd(-40,40),vy:rnd(-120,-50),life:rnd(.6,1.1),max:1.1,col:i%2?'#f3d27a':CLS_COL[c],s:2,g:160});
   save(); if(sheetOpen && (S.tab==='bag'||S.tab==='skill')) renderPanel();
 }
@@ -95,7 +95,7 @@ function dropLoot(e){
   const slot=SLOTS[Math.floor(Math.random()*SLOTS.length)];
   const it=makeItem(cls,slot,rar,S.zone,L.id); if(rar>=2) SND.play('loot',rar); prof().i++;
   const label=`${RAR[it.rar].name}: ${itemName(it)}`;
-  if(bagUsed()>=BAG_MAX){ const g=sellPrice(it); S.gold+=g; floats.push({x:e.x,y:enemyTop(e)-30,text:`Сумка полна +${fmt(g)}`,col:'#968aa3',size:9,life:1.4,vy:-18}); return; }
+  if(bagUsed()>=BAG_MAX){ const g=sellPrice(it); S.gold+=g; floats.push({x:e.x,y:enemyTop(e)-30,text:`${T("Сумка полна +")}${fmt(g)}`,col:'#968aa3',size:9,life:1.4,vy:-18}); return; }
   S.inv.bag.push(it);
   floats.push({x:e.x,y:enemyTop(e)-30,text:label,col:RAR[it.rar].col,size:it.rar>=3?11:9,life:1.6,vy:-18});
   for(let i=0;i<(4+it.rar*4);i++) parts.push({x:e.x,y:enemyY(e)-6,vx:rnd(-30,30),vy:rnd(-90,-40),life:rnd(.5,.9),max:.9,col:RAR[it.rar].col,s:1.5,g:160});

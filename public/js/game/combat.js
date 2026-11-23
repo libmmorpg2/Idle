@@ -20,7 +20,7 @@ function killEnemy(e){
   dropLoot(e);
   if(e.boss){
     S.wave=0; bossT=0; const z=S.zone;
-    SND.play('win'); if(z>=S.best){ S.best=z+1; banner('Босс повержен',`Зона ${z+1} открыта`,2.2); } else banner('Босс повержен',locOf(z).bossName,1.6);
+    SND.play('win'); if(z>=S.best){ S.best=z+1; banner(T('Босс повержен'),`${T("Зона")} ${z+1} ${T("открыта")}`,2.2); } else banner(T('Босс повержен'),locOf(z).bossName,1.6);
     if(Math.random()<0.25){ const P=POTS[Math.floor(Math.random()*POTS.length)]; const s=potSt(); s.own[P.id]=(s.own[P.id]||0)+1; floats.push({x:e.x,y:enemyTop(e)-40,text:P.name,col:P.col,size:11,life:1.6,vy:-18}); }
     hero.hp=st.maxHp(); save(); renderPanel();
   } else S.wave++;
@@ -28,18 +28,18 @@ function killEnemy(e){
 function addXp(x){
   x*=(1+petB('xp')/100)*potM('xp'); S.xp+=x; let up=false;
   while(S.xp>=xpNeed(S.lvl)){ S.xp-=xpNeed(S.lvl); S.lvl++; up=true; }
-  if(up){ SND.play('level'); hero.hp=st.maxHp(); banner(`Уровень ${S.lvl}`, SK.some(s=>s.unlock===S.lvl)?'Новое умение открыто':'', 1.4); buildSkillButtons(); renderPanel();
+  if(up){ SND.play('level'); hero.hp=st.maxHp(); banner(`${T("Уровень")} ${S.lvl}`, SK.some(s=>s.unlock===S.lvl)?T('Новое умение открыто'):'', 1.4); buildSkillButtons(); renderPanel();
     for(let i=0;i<20;i++) parts.push({x:HX+rnd(-14,14),y:GY-rnd(0,32),vx:rnd(-10,10),vy:rnd(-80,-30),life:rnd(.6,1),max:1,col:'#efe3da',s:1.5,g:0}); }
 }
 function heroHurt(dmg){
   if(hero.dead) return;
-  if(buff.guard>0){ SND.play('block'); floats.push({x:HX,y:GY-50,text:'блок',col:'#f3b94a',size:10,life:.7,vy:-30}); for(let i=0;i<5;i++) parts.push({x:HX+14,y:GY-22+rnd(-6,6),vx:rnd(20,60),vy:rnd(-40,20),life:.3,max:.3,col:'#ffd27a',s:1.5,g:0}); return; }
-  if(Math.random()<pv('dodge')/100){ floats.push({x:HX,y:GY-50,text:'уклон',col:'#8fd8ff',size:10,life:.7,vy:-30}); return; }
-  if(buff.shield>0){ const a=Math.min(buff.shield,dmg); buff.shield-=a; dmg-=a; if(dmg<=0){ floats.push({x:HX,y:GY-50,text:'щит',col:'#c46bff',size:10,life:.6,vy:-30}); return; } }
+  if(buff.guard>0){ SND.play('block'); floats.push({x:HX,y:GY-50,text:T('блок'),col:'#f3b94a',size:10,life:.7,vy:-30}); for(let i=0;i<5;i++) parts.push({x:HX+14,y:GY-22+rnd(-6,6),vx:rnd(20,60),vy:rnd(-40,20),life:.3,max:.3,col:'#ffd27a',s:1.5,g:0}); return; }
+  if(Math.random()<pv('dodge')/100){ floats.push({x:HX,y:GY-50,text:T('уклон'),col:'#8fd8ff',size:10,life:.7,vy:-30}); return; }
+  if(buff.shield>0){ const a=Math.min(buff.shield,dmg); buff.shield-=a; dmg-=a; if(dmg<=0){ floats.push({x:HX,y:GY-50,text:T('щит'),col:'#c46bff',size:10,life:.6,vy:-30}); return; } }
   dmg*=(1-HB().def)*(potOn('def')?0.8:1); hero.hp-=dmg; hero.flash=0.15; SND.play('hurt');
   if(FR.hurt && hero.state==='idle' && hero.hp>0){ hero.state='hurt'; hero.hits=[]; hero.hi=0; setAnim('hurt',{dur:0.35}); }
   floats.push({x:HX-4,y:GY-44,text:'-'+fmt(dmg),col:'#ff5a6e',size:11,life:.8,vy:-30});
-  if(hero.hp<=0){ hero.hp=0; hero.dead=true; hero.deadT=3; arrows=[]; rains=[]; setState('dead'); SND.play('die'); banner('Герой пал','Улучши защиту и урон',2.4); }
+  if(hero.hp<=0){ hero.hp=0; hero.dead=true; hero.deadT=3; arrows=[]; rains=[]; setState('dead'); SND.play('die'); banner(T('Герой пал'),T('Улучши защиту и урон'),2.4); }
 }
 
 const staff=()=>({x:HX+HD.muzzle[0]*hpx(),y:GY-HD.muzzle[1]*hpx()});
@@ -194,7 +194,7 @@ function update(dt){
 
   if(bossT>0 && !hero.dead){
     bossT-=dt;
-    if(bossT<=0){ bossT=0; enemies=[]; S.wave=0; banner('Время вышло','Босс сбежал. Попробуй снова',2); }
+    if(bossT<=0){ bossT=0; enemies=[]; S.wave=0; banner(T('Время вышло'),T('Босс сбежал. Попробуй снова'),2); }
   }
   for(const p of parts){ p.life-=dt; p.vy+=(p.g||0)*dt; p.x+=(p.vx-runV)*dt; p.y+=p.vy*dt;
     if(p.streak&&p.y>GY-2){ p.life=0; parts.push({x:p.x,y:GY-2,vx:rnd(-30,30),vy:rnd(-60,-20),life:.25,max:.25,col:'#e3a6ff',s:2,g:200}); }

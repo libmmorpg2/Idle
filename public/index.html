@@ -7,6 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Philosopher:wght@400;700&family=Exo+2:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="css/style.css">
+<script src="js/i18n/i18n.js"></script>
+<script src="js/i18n/en.js"></script>
 </head>
 <body>
 <div class="loader" id="loader" role="status" aria-live="polite">
@@ -28,6 +30,7 @@
   </div>
 </div>
 <script>
+i18nDom(document.getElementById('loader'));
 /* Экран загрузки: работает до загрузки остальных скриптов */
 var LOAD=(function(){
   var el=document.getElementById('loader'), fill=document.getElementById('ldFill'), st=document.getElementById('ldStatus'), tip=document.getElementById('ldTip');
@@ -45,18 +48,18 @@ var LOAD=(function(){
     requestAnimationFrame(tick);
   }
   requestAnimationFrame(tick);
-  function finish(){ done=true; fill.style.width='100%'; st.textContent='Готово'; st.classList.remove('err');
+  function finish(){ done=true; fill.style.width='100%'; st.textContent=T('Готово'); st.classList.remove('err');
     setTimeout(function(){ el.classList.add('out'); clearInterval(tipTimer);
       setTimeout(function(){ if(typeof SPLASH!=="undefined"&&SPLASH) SPLASH.stop(); el.remove(); },700); },120); }
-  var TIPS=['Герой сражается и без тебя — до 8 часов добычи, пока ты офлайн',
-    'Зелья дают +20% на 10 минут, а их время складывается до часа',
-    'Собери 5 книг умения, чтобы попытаться его изучить',
-    'Заточка поднимает вещь вплоть до +9 — но не всегда удачно',
-    'Питомцы и плащи дают постоянные бонусы герою',
-    'Кнопка x2 ускоряет бой вдвое',
-    'В сумке помещается 200 предметов — не забывай продавать лишнее'];
+  var TIPS=[T('Герой сражается и без тебя — до 8 часов добычи, пока ты офлайн'),
+    T('Зелья дают +20% на 10 минут, а их время складывается до часа'),
+    T('Собери 5 книг умения, чтобы попытаться его изучить'),
+    T('Заточка поднимает вещь вплоть до +9 — но не всегда удачно'),
+    T('Питомцы и плащи дают постоянные бонусы герою'),
+    T('Кнопка x2 ускоряет бой вдвое'),
+    T('В сумке помещается 200 предметов — не забывай продавать лишнее')];
   var ti=Math.floor(Math.random()*TIPS.length);
-  function showTip(){ tip.classList.remove('on'); setTimeout(function(){ tip.textContent='Совет: '+TIPS[ti++%TIPS.length]; tip.classList.add('on'); },300); }
+  function showTip(){ tip.classList.remove('on'); setTimeout(function(){ tip.textContent=(T('Совет:')+' ')+TIPS[ti++%TIPS.length]; tip.classList.add('on'); },300); }
   showTip(); var tipTimer=setInterval(showTip,4500);
   return {
     set:function(p,text){ if(done) return; real=Math.max(real,p); if(text){ st.textContent=text; st.classList.remove('err'); } },
@@ -64,7 +67,7 @@ var LOAD=(function(){
     login:function(on){ document.getElementById('login').hidden=!on; document.getElementById('ldProgress').hidden=!!on;
       if(on&&!pauseAt) pauseAt=Date.now(); else if(!on&&pauseAt){ paused+=Date.now()-pauseAt; pauseAt=0; } },
     get open(){ return !done; },
-    done:function(){ if(done||ready) return; real=100; ready=true; st.textContent='Готовим поле боя…'; st.classList.remove('err'); }
+    done:function(){ if(done||ready) return; real=100; ready=true; st.textContent=T('Готовим поле боя…'); st.classList.remove('err'); }
   };
 })();
 LOAD.set(12);
@@ -140,7 +143,7 @@ LOAD.set(12);
     </div>
 </div>
 
-<script>LOAD.set(25,'Загружаем мир…')</script>
+<script>i18nDom(document.getElementById('app'));LOAD.set(25,T('Загружаем мир…'))</script>
 <script src="js/data/assets.js"></script>
 <script src="js/data/frames.js"></script>
 <script src="js/data/monsters.js"></script>
@@ -177,6 +180,7 @@ LOAD.set(12);
 <script src="js/game/offline.js"></script>
 <script src="js/ui/picker.js"></script>
 <script src="js/net/chat.js"></script>
+<script src="js/net/ton.js"></script>
 <script src="js/main.js"></script>
 </body>
 </html>

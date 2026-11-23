@@ -2,13 +2,13 @@
 const hudCache={};
 function setT(id,v){ if(hudCache[id]!==v){ hudCache[id]=v; $(id).textContent=v; } }
 let lastBM=null;
-function bmPop(d){ const el=document.createElement('div'); el.className='bmpop'; el.textContent='БМ ▲ +'+fmt(d); $('stage').appendChild(el); setTimeout(()=>el.remove(),1300); }
+function bmPop(d){ const el=document.createElement('div'); el.className='bmpop'; el.textContent=T('БМ ▲ +')+fmt(d); $('stage').appendChild(el); setTimeout(()=>el.remove(),1300); }
 let potHudSig='';
 function potHud(){ const act=POTS.filter(p=>potOn(p.id)); const sig=act.map(p=>p.id+Math.ceil(potLeft(p.id)/60000)).join(',');
   if(sig===potHudSig) return; potHudSig=sig;
-  $('potBar').innerHTML=act.map(p=>`<button data-pot="${p.id}" aria-label="${p.name}: ${p.desc}, осталось ${fmtMin(potLeft(p.id))}" title="${p.name}: ${p.desc}"><img src="${potIcon(p.col)}" alt=""><small>${Math.ceil(potLeft(p.id)/60000)}м</small></button>`).join(''); }
+  $('potBar').innerHTML=act.map(p=>`<button data-pot="${p.id}" aria-label="${p.name}: ${p.desc}${T(", осталось")} ${fmtMin(potLeft(p.id))}" title="${p.name}: ${p.desc}"><img src="${potIcon(p.col)}" alt=""><small>${Math.ceil(potLeft(p.id)/60000)}${T("м")}</small></button>`).join(''); }
 function hud(){
-  const bm=calcBM(); setT('dpsS','БМ '+fmt(bm));
+  const bm=calcBM(); setT('dpsS',(T('БМ')+' ')+fmt(bm));
   if(lastBM!=null && bm>lastBM && !hero.dead && !sheetOpen) bmPop(bm-lastBM);
   lastBM=bm;
   const mh=st.maxHp();
@@ -30,14 +30,14 @@ function hud(){
   if(hudCache.pips!==pk){ hudCache.pips=pk;
     let h=''; for(let i=0;i<WAVE;i++) h+=`<i class="${i<S.wave?'on':''}"></i>`;
     h+=`<i class="boss ${bossT>0?'on':''}"></i>`; $('pips').innerHTML=h; }
-  $('btimer').hidden=!(bossT>0); if(bossT>0) setT('btimer','Босс · '+bossT.toFixed(1)+' с');
+  $('btimer').hidden=!(bossT>0); if(bossT>0) setT('btimer',(T('Босс ·')+' ')+bossT.toFixed(1)+(' '+T('с')));
   SK.forEach((s,i)=>{
     const b=$('sk'+i); if(!b) return;
     const nl=!isL(S.hero,'a'+i), locked=nl||S.lvl<s.unlock;
     b.classList.toggle('locked',locked);
     b.classList.toggle('ready',!locked&&skCd[i]<=0); b.classList.toggle('queued',!!skQ&&skQ.i===i);
     b.querySelector('.cd').style.setProperty('--p',locked?'100%':(skCd[i]/s.cd*100)+'%');
-    b.querySelector('.cdt').textContent=nl?'КНИГА':S.lvl<s.unlock?`Ур. ${s.unlock}`:(skCd[i]>0?Math.ceil(skCd[i]):'');
+    b.querySelector('.cdt').textContent=nl?T('КНИГА'):S.lvl<s.unlock?`${T("Ур.")} ${s.unlock}`:(skCd[i]>0?Math.ceil(skCd[i]):'');
   });
 }
 function frameThumb(canvas,_who,anim,idx){

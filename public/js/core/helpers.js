@@ -10,4 +10,4 @@ function fmt(n){
   let i=-1; while(n>=1000 && i<SUF.length-1){n/=1000;i++}
   return (n<10?n.toFixed(2):n<100?n.toFixed(1):Math.floor(n))+SUF[i];
 }
-function showErr(e){ const b=$('err'); if(!b) return; b.hidden=false; b.textContent='Ошибка: '+(e&&e.message||e); }
+function showErr(e){ const b=$('err'); if(!b) return; b.hidden=false; b.textContent=(T('Ошибка:')+' ')+(e&&e.message||e); }

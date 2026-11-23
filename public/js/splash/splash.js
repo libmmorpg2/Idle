@@ -22,8 +22,8 @@ const SPLASH=(()=>{
   const IDS=['mage','tank','asn','sam'];
   const SC={mage:1,tank:.7,asn:.7,sam:.7};
   const HC={mage:['#b45cff','#e8c0ff','#2a0f4a'],tank:['#5ab4ff','#d0eeff','#0c2440'],asn:['#ff3a5a','#ffc0cc','#3a0c18'],sam:['#5fe08a','#d8ffe4','#0c3220']};
-  const NAME={mage:'Маг бездны',tank:'Викинг',asn:'Хранительница клинков',sam:'Лесной следопыт'};
-  const ROLE={mage:'Маг',tank:'Танк',asn:'Убийца',sam:'Стрелок'};
+  const NAME={mage:T('Маг бездны'),tank:T('Викинг'),asn:T('Хранительница клинков'),sam:T('Лесной следопыт')};
+  const ROLE={mage:T('Маг'),tank:T('Танк'),asn:T('Убийца'),sam:T('Стрелок')};
   const MUZ={mage:[14,22],tank:[18,24],asn:[20,28],sam:[25,33]};
   const ATK={mage:{a:'atk',dur:.95,hit:.38,proj:'bolt',cd:1.0},tank:{a:'atk',dur:.6,hit:.3,melee:true,cd:.7},
              asn:{a:'atk',dur:.55,hit:.25,proj:'knife',cd:.55},sam:{a:'atk',dur:1.0,hit:.56,proj:'arrow',cd:.95}};
@@ -122,7 +122,7 @@ const SPLASH=(()=>{
     m.hp-=big?3:1; m.flash=.1; m.kx=(big?900:420)*g.s/8;
     const y=g.gy-8*m.s, d=R(2e3,9e3)*(big?4:1);
     fxs.push({id,x:g.mx,y:y+8*m.s*(id==='mage'?1.4:.8),s:m.s*(id==='mage'?1.1:.9),t:0,dur:.4});
-    floatTxt(g.mx+R(-10,10)*g.s/3,y-14*m.s,(big?'КРИТ ':'')+fmtD(d),big?'#ffd27a':'#fff',big?18+g.s*2:12+g.s*1.2);
+    floatTxt(g.mx+R(-10,10)*g.s/3,y-14*m.s,(big?(T('КРИТ')+' '):'')+fmtD(d),big?'#ffd27a':'#fff',big?18+g.s*2:12+g.s*1.2);
     burst(g.mx,y,['#fff',HC[id][1],HC[id][0]],big?40:12,(big?420:240)*g.s/6,g.s*.6);
     shake=Math.max(shake,big?14:5); if(big){ flash=.45; flashCol='255,255,255'; ring(g.mx,g.gy,48*g.s/3,HC[id][1],.6,6); hit(); }
     if(m.hp<=0){ burst(g.mx,y,monColors(m.type),50,380*g.s/6,g.s*.8); ring(g.mx,g.gy,40*g.s/3,'#c46bff',.5,5); S2.mob=null; setTimeout(()=>{ if(S2.mob===null) s2Mob(false); },250); }
@@ -185,15 +185,15 @@ const SPLASH=(()=>{
   }
 
   /* ---------- цикл ---------- */
-  let raf=0, last=performance.now(), T=0, running=true;
+  let raf=0, last=performance.now(), clock=0, running=true;
   function frame(now){
     if(!running) return; raf=requestAnimationFrame(frame);
-    const dt=Math.min(.05,(now-last)/1000); last=now; T+=dt;
+    const dt=Math.min(.05,(now-last)/1000); last=now; clock+=dt;
     ui();
     try{ s2Update(dt); updFx(dt);
       c.setTransform(DPR,0,0,DPR,0,0); c.imageSmoothingEnabled=false;
       if(shake>0) c.translate(R(-1,1)*shake*.5,R(-1,1)*shake*.5);
-      s2Draw(T);
+      s2Draw(clock);
       if(flash>0){ c.setTransform(DPR,0,0,DPR,0,0); c.fillStyle=`rgba(${flashCol},${Math.min(.85,flash)})`; c.fillRect(0,0,W,H); }
       const v=c.createRadialGradient(W/2,H/2,Math.min(W,H)*.35,W/2,H/2,Math.max(W,H)*.75); v.addColorStop(0,'rgba(0,0,0,0)'); v.addColorStop(1,'rgba(0,0,0,.55)');
       c.setTransform(DPR,0,0,DPR,0,0); c.fillStyle=v; c.fillRect(0,0,W,H);

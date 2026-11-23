@@ -8,9 +8,9 @@ function offlineReward(sec){
   if(gold<1) return;
   const h=Math.floor(sec/3600), m=Math.floor(sec%3600/60);
   const md=$('modal');
-  md.innerHTML=`<div class="card"><h2>Пока тебя не было</h2><p>Герой охотился ${h?h+' ч ':''}${m} мин и собрал добычу</p>
-  <div class="gain"><span><span class="coin"></span><span style="color:var(--gold)">${fmt(gold)}</span></span><span style="color:var(--xp)">+${fmt(xp)} опыта</span>${stn?`<span style="color:#7af0ff"><img class="stn" src="${STONE_ICON}" alt="">${stn}</span>`:''}</div>
-  <button id="takeBtn">Забрать</button></div>`;
+  md.innerHTML=`<div class="card"><h2>${T("Пока тебя не было")}</h2><p>${T("Герой охотился")} ${h?h+(' '+T('ч')+' '):''}${m} ${T("мин и собрал добычу")}</p>
+  <div class="gain"><span><span class="coin"></span><span style="color:var(--gold)">${fmt(gold)}</span></span><span style="color:var(--xp)">+${fmt(xp)} ${T("опыта")}</span>${stn?`<span style="color:#7af0ff"><img class="stn" src="${STONE_ICON}" alt="">${stn}</span>`:''}</div>
+  <button id="takeBtn">${T("Забрать")}</button></div>`;
   md.hidden=false;
   $('takeBtn').onclick=()=>{ S.gold+=gold; S.stones=(S.stones||0)+stn; addXp(xp); md.hidden=true; renderPanel(); save(); };
 }

@@ -43,4 +43,4 @@ function bookIcon(c,key){ key=key||'a0'; const ck=c+key; if(bookIcCache[ck]) ret
   g.forEach((row,j)=>{ for(let i=0;i<12;i++){ const ch=row[i]; if(!ch||ch==='.') continue; px(6+i,4+j,ch==='o'?'#ffffff':'#f3d27a'); } });
   for(let j=18;j<=21;j++){ px(16,j,CLS_COL[c]); px(17,j,CLS_COL[c]); } x.clearRect(16*Z,21*Z+Z/2,2*Z,Z/2);
   return bookIcCache[ck]=cv.toDataURL(); }
-function learnKey(key){ const c=S.hero; if(isL(c,key)||bookN(c,key)<1) return; S.books[c][key]--; S.learn[c][key]=1; banner('Навык изучен',bookName(c,key),1.6); buildSkillButtons(); renderPanel(); save(); }
+function learnKey(key){ const c=S.hero; if(isL(c,key)||bookN(c,key)<1) return; S.books[c][key]--; S.learn[c][key]=1; banner(T('Навык изучен'),bookName(c,key),1.6); buildSkillButtons(); renderPanel(); save(); }

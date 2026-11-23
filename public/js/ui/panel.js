@@ -10,39 +10,39 @@ function bulk(costFn,level,max){
 const SK_BOOKS=5, SK_CH=0.30;
 function skillTry(key,gold,ok){ const c=S.hero; if(S.gold<gold||bookN(c,key)<SK_BOOKS) return;
   S.gold-=gold; S.books[c][key]-=SK_BOOKS;
-  if(Math.random()<SK_CH){ ok(); banner('Навык улучшен',bookName(c,key),1.4); } else banner('Неудача',`${SK_BOOKS} книг потрачено, навык не улучшен`,1.6);
+  if(Math.random()<SK_CH){ ok(); banner(T('Навык улучшен'),bookName(c,key),1.4); } else banner(T('Неудача'),`${SK_BOOKS} ${T("книг потрачено, навык не улучшен")}`,1.6);
   buildSkillButtons(); renderPanel(); save(); }
 const upBtn=(id,data,key)=>`<button class="buy" id="${id}" ${data}><small></small><span class="c"><span class="coin"></span><span class="v"></span></span><span class="c bkc"><img class="bk" src="${bookIcon(S.hero,key)}" alt=""><span class="bv"></span></span></button>`;
 function learnBtn(key,locked){ const n=bookN(S.hero,key);
-  return `<button class="buy learn" data-learn="${key}" ${n&&!locked?'':'disabled'}><small>${locked?'рано':'изучить'}</small><span class="c"><img class="bk" src="${bookIcon(S.hero,key)}" alt="">${n}/1</span></button>`; }
+  return `<button class="buy learn" data-learn="${key}" ${n&&!locked?'':'disabled'}><small>${locked?T('рано'):T('изучить')}</small><span class="c"><img class="bk" src="${bookIcon(S.hero,key)}" alt="">${n}/1</span></button>`; }
 function renderPanel(){
   if(S.tab==='reborn') S.tab='hero';
   const list=$('list'); const tab=S.tab;
   document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.tab===(sheetOpen?tab:'battle')));
-  $('sheetTitle').textContent={hero:'Улучшения',skill:'Умения',bag:'Сумка',map:'Локации',shop:'Магазин',profile:'Профиль'}[tab]||'Герой';
+  $('sheetTitle').textContent={hero:T('Улучшения'),skill:T('Умения'),bag:T('Сумка'),map:T('Локации'),shop:T('Магазин'),profile:T('Профиль')}[tab]||T('Герой');
   $('mult').style.visibility=(tab==='bag'||tab==='map'||tab==='shop'||tab==='profile')?'hidden':'visible';
   document.querySelectorAll('#mult button').forEach(b=>b.classList.toggle('on',+b.dataset.m===S.mult));
   let h='', sec='';
   if(tab==='hero'){
     const bm=calcBM();
-    h+=`<div class="bmcard"><span>Боевая мощь</span><b>${fmt(bm)}</b><div class="bmrow"><i>Урон <em>${fmt(st.atk())}</em></i><i>Скор. <em>${(()=>{const b=buff.power;buff.power=0;const v=st.aps();buff.power=b;return v.toFixed(2);})()}</em></i><i>Крит <em>${Math.round(st.crit()*100)}%</em></i><i>Здоровье <em>${fmt(st.maxHp())}</em></i></div></div>`;
-    h+=`<button class="pk-open" data-picker="1"><img src="${PORTS[S.hero]}" alt=""><span><b>${HD.name}</b><small>${HEROES_ROLE[S.hero]||''} · сменить героя</small></span><em>›</em></button><div class="sec">Улучшения</div>`;
+    h+=`<div class="bmcard"><span>${T("Боевая мощь")}</span><b>${fmt(bm)}</b><div class="bmrow"><i>${T("Урон")} <em>${fmt(st.atk())}</em></i><i>${T("Скор.")} <em>${(()=>{const b=buff.power;buff.power=0;const v=st.aps();buff.power=b;return v.toFixed(2);})()}</em></i><i>${T("Крит")} <em>${Math.round(st.crit()*100)}%</em></i><i>${T("Здоровье")} <em>${fmt(st.maxHp())}</em></i></div></div>`;
+    h+=`<button class="pk-open" data-picker="1"><img src="${PORTS[S.hero]}" alt=""><span><b>${HD.name}</b><small>${HEROES_ROLE[S.hero]||''} ${T("· сменить героя")}</small></span><em>›</em></button><div class="sec">${T("Улучшения")}</div>`;
     UPG.forEach(u=>{
       const lv=S.upg[u.id];
-      h+=`<div class="row"><div class="tag">${u.tag}</div><div class="info"><h3>${nm(u.name)}<span>ур. ${lv}</span></h3><p>${u.info()}</p></div>
+      h+=`<div class="row"><div class="tag">${u.tag}</div><div class="info"><h3>${nm(u.name)}<span>${T("ур.")} ${lv}</span></h3><p>${u.info()}</p></div>
       <button class="buy" id="buy-${u.id}" data-u="${u.id}"><small></small><span class="c"><span class="coin"></span><span class="v"></span></span><span class="c st"><img class="stn" src="${STONE_ICON}" alt=""><span class="sv"></span></span><span class="c sl"><span class="gem"></span><span class="slv"></span></span></button></div>`;
     });
   } else if(tab==='skill'){
-    h+=`<div class="sec">Активные умения</div>`;
+    h+=`<div class="sec">${T("Активные умения")}</div>`;
     SK.forEach((s,i)=>{
       const lv=S.sk[i], locked=S.lvl<s.unlock, key='a'+i, ln=isL(S.hero,key);
-      h+=`<div class="row ${ln?'':'nolearn'}"><div class="tag"><canvas id="ti${i}"></canvas></div><div class="info"><h3>${s.name}<span>${ln?'ур. '+lv:'не изучен'}</span></h3><p>${!ln?`${s.info(lv)}<br><em class="needbk">Нужна книга «${s.name}»${locked?` · с ур. ${s.unlock}`:''}</em>`:locked?`Откроется на уровне ${s.unlock}`:s.info(lv)+` · перезарядка ${+(s.cd*(1-pv('cdr')/100)).toFixed(1)} с`}</p></div>
+      h+=`<div class="row ${ln?'':'nolearn'}"><div class="tag"><canvas id="ti${i}"></canvas></div><div class="info"><h3>${s.name}<span>${ln?(T('ур.')+' ')+lv:T('не изучен')}</span></h3><p>${!ln?`${s.info(lv)}<br><em class="needbk">${T("Нужна книга «")}${s.name}»${locked?` ${T("· с ур.")} ${s.unlock}`:''}</em>`:locked?`${T("Откроется на уровне")} ${s.unlock}`:s.info(lv)+` ${T("· перезарядка")} ${+(s.cd*(1-pv('cdr')/100)).toFixed(1)} ${T("с")}`}</p></div>
       ${ln?upBtn('bsk-'+i,`data-s="${i}"`,key):learnBtn(key,locked)}</div>`;
     });
-    h+=`<div class="sec">Пассивные навыки</div>`;
+    h+=`<div class="sec">${T("Пассивные навыки")}</div>`;
     PSV[S.hero].forEach(p=>{
       const lv=S.psv[S.hero][p.id]||0, locked=S.lvl<p.unlock, c=PSV_COL[p.ic], key='p'+p.id, ln=isL(S.hero,key);
-      h+=`<div class="row ${locked||!ln?'plock':''} ${ln?'':'nolearn'}"><div class="tag psv"><img src="${pixIcon(PSV_ICON[p.ic],c[0],c[1])}" alt=""></div><div class="info"><h3>${p.name}<span>${ln?`ур. ${lv}/${p.max}`:'не изучен'}</span></h3><p>${!ln?`За уровень +${p.per}${p.unit}<br><em class="needbk">Нужна книга «${p.name}»${locked?` · с ур. ${p.unlock}`:''}</em>`:locked?`Откроется на уровне ${p.unlock}`:`Сейчас <b>+${+(lv*p.per).toFixed(1)}${p.unit}</b> · за уровень +${p.per}`}</p></div>
+      h+=`<div class="row ${locked||!ln?'plock':''} ${ln?'':'nolearn'}"><div class="tag psv"><img src="${pixIcon(PSV_ICON[p.ic],c[0],c[1])}" alt=""></div><div class="info"><h3>${p.name}<span>${ln?`${T("ур.")} ${lv}/${p.max}`:T('не изучен')}</span></h3><p>${!ln?`${T("За уровень +")}${p.per}${p.unit}<br><em class="needbk">${T("Нужна книга «")}${p.name}»${locked?` ${T("· с ур.")} ${p.unlock}`:''}</em>`:locked?`${T("Откроется на уровне")} ${p.unlock}`:`${T("Сейчас")} <b>+${+(lv*p.per).toFixed(1)}${p.unit}</b> ${T("· за уровень +")}${p.per}`}</p></div>
       ${ln?upBtn('bps-'+p.id,`data-p="${p.id}"`,key):learnBtn(key,locked)}</div>`;
     });
   } else if(tab==='bag'){
@@ -54,39 +54,26 @@ function renderPanel(){
   } else {
   }
   if(tab==='profile'){
-    const P=prof(), ids=Object.keys(HEROES);
-    const bms=ids.map(id=>withHero(id,()=>calcBM()));
-    h+=`<div class="pf-card"><img src="${PORTS[S.hero]}" alt=""><div><b>${HD.name}</b><span>${HEROES_ROLE[S.hero]||''}, уровень ${S.lvl}</span><em>Боевая мощь ${fmt(calcBM())}</em></div></div>
-    <button class="pk-open" data-picker="1"><img src="${PORTS[S.hero]}" alt=""><span><b>Сменить героя</b><small>Открыть выбор героя</small></span><em>›</em></button>
-    <div class="frame"><div class="ftitle">Статистика</div><dl class="pf-st">
-      <dt>Текущая зона</dt><dd>${S.zone}</dd><dt>Открыто зон</dt><dd>${S.best}</dd>
-      <dt>Убито врагов</dt><dd>${fmt(P.k)}</dd><dt>Убито боссов</dt><dd>${fmt(P.b)}</dd>
-      <dt>Добыто золота</dt><dd>${fmt(P.g)}</dd><dt>Найдено вещей</dt><dd>${fmt(P.i)}</dd>
-      <dt>Выпито зелий</dt><dd>${fmt(P.p)}</dd><dt>Время в игре</dt><dd>${fmtTime(P.t)}</dd></dl></div>
-    <div class="frame"><div class="ftitle">Герои</div><div class="pf-h">${ids.map((id,k)=>`<div class="${id===S.hero?'on':''}"><img src="${PORTS[id]}" alt=""><b>${HEROES[id].name}</b><small>${HEROES_ROLE[id]||''}</small><em>БМ ${fmt(bms[k])}</em></div>`).join('')}</div></div>`;
     const sc=S.snd||{sfx:true,mus:true};
-    h+=`<div class="frame snd"><div class="ftitle">Звук</div>
-      <div class="farmtog"><span><b>Звуки</b><small>Удары, выстрелы, заклинания, добыча</small></span><button class="sw ${sc.sfx?'on':''}" data-snd="sfx" role="switch" aria-checked="${!!sc.sfx}" aria-label="Звуки"><i></i></button></div>
-      <div class="farmtog"><span><b>Музыка</b><small>Спокойная тема в зонах, боевая в бою с боссом</small></span><button class="sw ${sc.mus?'on':''}" data-snd="mus" role="switch" aria-checked="${!!sc.mus}" aria-label="Музыка"><i></i></button></div></div>`;
-    if(!TG) h+=`<div class="frame acct"><div class="ftitle">Аккаунт</div><p class="note">Вы вошли через Telegram как <b>${esc(userName())}</b>. Прогресс хранится на сервере.</p><button id="logoutBtn" class="buy">Выйти</button></div>`;
-    h+=`<div class="frame reset"><div class="ftitle">Новая игра</div>
-    <p class="note">Полностью удаляет прогресс: зоны, уровень, золото, умения и всю экипировку всех героев. Отменить нельзя.</p>
-    <button id="resetBtn" class="danger">Начать сначала</button></div>`;
+    h+=`<div class="frame snd"><div class="ftitle">${T("Звук")}</div>
+      <div class="farmtog"><span><b>${T("Звуки")}</b><small>${T("Удары, выстрелы, заклинания, добыча")}</small></span><button class="sw ${sc.sfx?'on':''}" data-snd="sfx" role="switch" aria-checked="${!!sc.sfx}" aria-label="${T("Звуки")}"><i></i></button></div>
+      <div class="farmtog"><span><b>${T("Музыка")}</b><small>${T("Спокойная тема в зонах, боевая в бою с боссом")}</small></span><button class="sw ${sc.mus?'on':''}" data-snd="mus" role="switch" aria-checked="${!!sc.mus}" aria-label="${T("Музыка")}"><i></i></button></div></div>`;
+    h+=`<div class="frame ton"><div class="ftitle">${T("TON-кошелёк")}</div><div class="tonbox" id="tonBox"></div></div>`;
+    h+=`<div class="frame lang"><div class="ftitle">${T("Язык")}</div><div class="langs">${LANGS.map(l=>`<button type="button" data-lang="${l.id}" class="${l.id===LANG?'on':''}"><span>${l.flag}</span>${l.name}</button>`).join('')}</div></div>`;
   }
   list.innerHTML=h;
   if(tab==='map') afterMap();
   if(tab==='skill' && imgReady) SK.forEach((s,i)=>frameThumb($('ti'+i),s.who,s.icon[0],s.icon[1]));
-  if(tab==='profile'){ const rb=$('resetBtn'); let rArm=false; if($('logoutBtn')) $('logoutBtn').onclick=logout;
-    rb.onclick=()=>{ if(!rArm){ rArm=true; rb.classList.add('armed'); rb.textContent='Точно? Нажми ещё раз'; setTimeout(()=>{ if(rb.isConnected){ rArm=false; rb.classList.remove('armed'); rb.textContent='Начать сначала'; } },4000); return; } newGame(); }; }
+  if(tab==='profile') tonMount();
   panelTick();
 }
 function panelTick(){
   if(S.tab==='hero') UPG.forEach(u=>{
     const b=$('buy-'+u.id); if(!b) return; const lv=S.upg[u.id];
-    if(u.max!=null && lv>=u.max){ b.disabled=true; b.querySelector('small').textContent='МАКС'; b.querySelector('.v').textContent='—'; b.querySelector('.sv').textContent='—'; return; }
+    if(u.max!=null && lv>=u.max){ b.disabled=true; b.querySelector('small').textContent=T('МАКС'); b.querySelector('.v').textContent='—'; b.querySelector('.sv').textContent='—'; return; }
     const [n,g,s,so]=bulkU(u); const soN=n?so:soulCostU(lv);
     const sl=b.querySelector('.c.sl'); sl.hidden=!soN; b.querySelector('.slv').textContent=soN; sl.classList.toggle('lack',soN>S.souls);
-    b.querySelector('small').textContent='+'+(n||1)+' ур.';
+    b.querySelector('small').textContent='+'+(n||1)+(' '+T('ур.'));
     b.querySelector('.v').textContent=fmt(n?g:upCost(u,lv));
     const sN=n?s:stoneCost(lv); b.querySelector('.c.st').hidden=!sN;
     const sv=b.querySelector('.sv'); sv.textContent=fmt(n?s:stoneCost(lv)); sv.parentNode.classList.toggle('lack',(n?s:stoneCost(lv))>S.stones);
@@ -94,9 +81,9 @@ function panelTick(){
     b.disabled=!(n&&S.gold>=g&&S.stones>=s&&S.souls>=so);
   });
   const skBtn=(b,key,gold,locked,maxed)=>{
-    if(maxed){ b.disabled=true; b.querySelector('small').textContent='МАКС'; b.querySelector('.v').textContent='—'; b.querySelector('.bv').textContent='—'; return; }
+    if(maxed){ b.disabled=true; b.querySelector('small').textContent=T('МАКС'); b.querySelector('.v').textContent='—'; b.querySelector('.bv').textContent='—'; return; }
     const bn=bookN(S.hero,key);
-    b.querySelector('small').textContent=locked?'закрыто':`шанс ${Math.round(SK_CH*100)}%`;
+    b.querySelector('small').textContent=locked?T('закрыто'):`${T("шанс")} ${Math.round(SK_CH*100)}%`;
     b.querySelector('.v').textContent=fmt(gold); b.querySelector('.v').parentNode.classList.toggle('lack',gold>S.gold);
     b.querySelector('.bv').textContent=`${bn}/${SK_BOOKS}`; b.querySelector('.bkc').classList.toggle('lack',bn<SK_BOOKS);
     b.disabled=locked||S.gold<gold||bn<SK_BOOKS; };
@@ -160,7 +147,7 @@ function newGame(){
   enemies=[]; arrows=[]; rains=[]; fxs=[]; parts=[]; floats=[]; buff.power=0; buff.guard=0; buff.shield=0; buff.shieldT=0; bossT=0; skCd=[0,0,0,0,0];
   hero.dead=false; hero.hp=st.maxHp(); setState('run'); layers=null;
   $('pic').style.backgroundImage=`url(${HUDP[S.hero]})`;
-  buildSkillButtons(); setSheet(false); banner('Новая игра','Путь начинается заново',2); save(); openPicker(true);
+  buildSkillButtons(); setSheet(false); banner(T('Новая игра'),T('Путь начинается заново'),2); save(); openPicker(true);
 }
 function switchHero(id){
   if(!HEROES[id] || id===S.hero) return;
@@ -168,5 +155,5 @@ function switchHero(id){
   skCd=[0,0,0,0,0]; buff.power=0; arrows=[]; rains=[]; fxs=[];
   if(!hero.dead) setState('run');
   $('pic').style.backgroundImage=`url(${HUDP[S.hero]})`;
-  banner(HD.name,'вступает в бой',1.4); buildSkillButtons(); renderPanel(); save();
+  banner(HD.name,T('вступает в бой'),1.4); buildSkillButtons(); renderPanel(); save();
 }
