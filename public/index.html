@@ -48,7 +48,6 @@ var LOAD=(function(){
     login:function(on){ document.getElementById('login').hidden=!on; document.getElementById('ldProgress').hidden=!!on; },
     get open(){ return !done; },
     done:function(){ if(done) return; this.set(100,'Готово');
-      if(typeof SPLASH!=='undefined'&&SPLASH&&SPLASH.demo){ st.textContent='Демо заставки — игра загружена'; return; }
       done=true;
       setTimeout(function(){ el.classList.add('out'); clearInterval(tipTimer);
         setTimeout(function(){ if(typeof SPLASH!=='undefined'&&SPLASH) SPLASH.stop(); el.remove(); },700); }, Math.max(350,1800-(Date.now()-t0))); }
