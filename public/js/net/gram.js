@@ -1,7 +1,6 @@
 // ---- GRAM: баланс, магазин за GRAM, паки, пополнение переводом TON ----
 const GRAM={balance:0,prices:null,topup:null,bought:[],busy:false,icon:''};
-const GRAM_MAP=["............","...######...","..#oo##oo#..",".#oooooooo#.","############",".#oooooooo#.","..#oooooo#..","...#oooo#...","....#oo#....",".....##.....","............","............"];
-const gramIcon=()=>GRAM.icon||(GRAM.icon=pixIcon(GRAM_MAP,'#1c5fc8','#7fdcff'));
+const gramIcon=()=>'assets/img/gram.png';
 const gramPrice=item=>GRAM.prices&&GRAM.prices[item];
 const gramTag=n=>`<img class="gri" src="${gramIcon()}" alt="">${fmt(n)}`;
 

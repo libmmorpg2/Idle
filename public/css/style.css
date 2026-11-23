@@ -715,3 +715,6 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .res .shopb img{width:18px;height:18px;image-rendering:pixelated}
 .res .shopb span{font:700 13px var(--f-display);color:var(--parch);letter-spacing:.02em}
 @media (max-width:360px){ .res{width:108px} .wr{font-size:13px;padding:0 6px;gap:5px} }
+
+/* иконка GRAM — гладкая картинка, не пиксель-арт */
+.gri,.wi .gri{image-rendering:auto;border-radius:50%}
