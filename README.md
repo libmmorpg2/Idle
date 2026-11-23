@@ -35,7 +35,7 @@ Idle-RPG в браузере: canvas-бой, улучшения, умения, �
    - `/setdomain` → выберите бота → укажите домен Railway (без `https://`) — иначе кнопка входа на сайте не заработает;
    - для Mini App: `/newapp` (или **Bot Settings → Menu Button**) → укажите URL `https://xxx.up.railway.app`.
 
-Таблицы `players` и `player_saves` создаются автоматически при старте (`db/schema.sql`).
+Таблицы `players`, `player_saves` и `chat_messages` создаются автоматически при старте (`db/schema.sql`).
 Healthcheck: `GET /healthz` (настроен в `railway.json`).
 
 ## Локальный запуск
@@ -60,6 +60,8 @@ npm start                   # http://localhost:3000
 | POST  | `/api/logout`        | выход (сбрасывает куку) |
 | GET   | `/api/save`          | → `{ state \| null, rev }` |
 | PUT   | `/api/save`          | `{ state, rev }` → `{ rev }`; `409`, если игра открыта в другой вкладке/устройстве |
+| GET   | `/api/chat?after=id` | новые сообщения чата (без `after` — последние 50) |
+| POST  | `/api/chat`          | `{ text, hero, lvl }` → `{ message }`; `429` — слишком часто (1 раз в 1,5 с, до 15 в минуту) |
 
 Авторизация: `Authorization: Bearer <token>` или кука `sid`.
 
@@ -68,7 +70,8 @@ npm start                   # http://localhost:3000
 ```
 server/index.js         сервер: раздаёт public/, вход и API сохранений
 server/telegram.js      проверка подписи данных Telegram
-db/schema.sql           схема таблиц players и player_saves
+server/chat.js          API общего чата
+db/schema.sql           схема таблиц players, player_saves, chat_messages
 public/index.html       разметка + подключение стилей и скриптов
 public/css/style.css    все стили
 public/assets/img/      графика (атлас спрайтов героев, портреты, иконки HUD)
@@ -81,7 +84,7 @@ public/js/
   audio/sound.js        процедурные звуки и музыка (Web Audio)
   items/                снаряжение, иконки предметов, инвентарь и дроп
   ui/                   HUD, сумка, локации, навигация, магазин, панель, выбор героя
-  net/chat.js           общий чат (работает только внутри Claude Artifact)
+  net/chat.js           общий чат (сообщения на сервере, опрос раз в 2,5–5 с)
   splash/splash.js      анимированная заставка при загрузке
   main.js               игровой цикл и старт
 ```

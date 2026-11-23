@@ -36,6 +36,7 @@ function start(data){
   if(!S.picked) openPicker(true);
   if(typeof sndBtnSync==='function') sndBtnSync(); if(typeof SND!=='undefined') SND.apply();
   last=performance.now(); requestAnimationFrame(loop);
+  chatStart();
 }
 try{ window.claude?.hot?.snapshot?.(()=>({S})); }catch(e){}
 let started=false;

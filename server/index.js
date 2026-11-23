@@ -5,6 +5,7 @@ const crypto = require('crypto');
 const express = require('express');
 const { Pool } = require('pg');
 const { verifyWebApp, verifyWidget } = require('./telegram');
+const chatRouter = require('./chat');
 
 const env = process.env;
 const PORT = +env.PORT || 3000;
@@ -121,6 +122,7 @@ api.put('/save', auth, async (req, res, next) => {
   } catch (e) { next(e); }
 });
 
+api.use('/chat', chatRouter(pool, auth));
 app.use('/api', api);
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
