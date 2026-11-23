@@ -31,7 +31,8 @@ async function flushSave(urgent){
   clearTimeout(SRV.retry); SRV.dirty=false; SRV.busy=true;
   const body=JSON.stringify({state:S,rev:SRV.rev});
   try{
-    const r=await fetch('api/save',{method:'PUT',headers:{'Content-Type':'application/json'},body,credentials:'same-origin',keepalive:!!urgent&&body.length<60000});
+    const r=await api('save',{method:'PUT',headers:{'Content-Type':'application/json'},body,keepalive:!!urgent&&body.length<60000});
+    if(r.status===401){ SRV.dead=true; srvMsg('Сессия истекла. Обновите страницу и войдите снова.'); return; }
     if(r.status===409){ SRV.dead=true; srvMsg('Игра открыта в другой вкладке или на другом устройстве. Обновите страницу — здесь прогресс больше не сохраняется.'); return; }
     if(!r.ok) throw new Error('HTTP '+r.status);
     SRV.rev=(await r.json()).rev;
@@ -45,7 +46,8 @@ async function flushSave(urgent){
 async function fetchSave(){   // ждёт сервер, пока не ответит: без загрузки нельзя начинать, иначе затрём прогресс
   for(;;){
     try{
-      const r=await fetch('api/save',{cache:'no-store',credentials:'same-origin'});
+      const r=await api('save');
+      if(r.status===401){ location.reload(); await new Promise(()=>{}); }
       if(!r.ok) throw new Error('HTTP '+r.status);
       const j=await r.json(); SRV.rev=j.rev|0; srvMsg(''); return j.state;
     }catch(e){ srvMsg('Не удалось загрузить сохранение с сервера, повторяю…'); await new Promise(f=>setTimeout(f,3000)); }

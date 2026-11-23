@@ -41,6 +41,7 @@ try{ window.claude?.hot?.snapshot?.(()=>({S})); }catch(e){}
 let started=false;
 async function boot(){ if(started) return; started=true;
   let data={}; try{ data=(window.claude&&window.claude.hot&&window.claude.hot.data)||{}; }catch(e){}
+  await login();
   const saved=await fetchSave();
   try{ start(Object.assign({},data,{saved})); }catch(e){ showErr(e); }
 }

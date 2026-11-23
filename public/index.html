@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Philosopher:wght@400;700&family=Exo+2:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="css/style.css">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
 
@@ -68,6 +69,14 @@
     <button class="tab" data-tab="map" id="tab-map"><span class="nb"><img data-na="map" alt=""></span><span class="tl">Локации</span></button>
     <button class="tab" data-tab="profile" id="tab-profile"><span class="nb"><img data-na="profile" alt=""></span><span class="tl">Профиль</span></button>
   </nav>
+    <div class="login" id="login" hidden>
+      <div class="login-card">
+        <h1>Маг Бездны</h1>
+        <p>Войдите через Telegram, чтобы прогресс сохранялся на сервере и был доступен с любого устройства.</p>
+        <div id="loginBtn" class="login-btn"></div>
+        <small id="loginMsg"></small>
+      </div>
+    </div>
     <div class="picker" id="picker" hidden role="dialog" aria-label="Выбор героя">
       <canvas id="pkBg" class="pk-bg"></canvas>
       <button class="pk-x" id="pkClose" aria-label="Закрыть">✕</button>
@@ -86,6 +95,7 @@
 <script src="js/world/ambient.js"></script>
 <script src="js/render/canvas.js"></script>
 <script src="js/core/state.js"></script>
+<script src="js/core/auth.js"></script>
 <script src="js/game/stats.js"></script>
 <script src="js/game/potions.js"></script>
 <script src="js/game/heroes.js"></script>

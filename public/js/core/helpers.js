@@ -1,6 +1,7 @@
 let FR=FRS.mage;
 /* ---------- helpers ---------- */
 const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const rnd=(a,b)=>a+Math.random()*(b-a);
 const SUF=['K','M','B','T','aa','ab','ac','ad','ae','af','ag','ah'];
 function fmt(n){

@@ -68,6 +68,7 @@ function renderPanel(){
     h+=`<div class="frame snd"><div class="ftitle">Звук</div>
       <div class="farmtog"><span><b>Звуки</b><small>Удары, выстрелы, заклинания, добыча</small></span><button class="sw ${sc.sfx?'on':''}" data-snd="sfx" role="switch" aria-checked="${!!sc.sfx}" aria-label="Звуки"><i></i></button></div>
       <div class="farmtog"><span><b>Музыка</b><small>Спокойная тема в зонах, боевая в бою с боссом</small></span><button class="sw ${sc.mus?'on':''}" data-snd="mus" role="switch" aria-checked="${!!sc.mus}" aria-label="Музыка"><i></i></button></div></div>`;
+    if(!TG) h+=`<div class="frame acct"><div class="ftitle">Аккаунт</div><p class="note">Вы вошли через Telegram как <b>${esc(userName())}</b>. Прогресс хранится на сервере.</p><button id="logoutBtn" class="buy">Выйти</button></div>`;
     h+=`<div class="frame reset"><div class="ftitle">Новая игра</div>
     <p class="note">Полностью удаляет прогресс: зоны, уровень, золото, умения и всю экипировку всех героев. Отменить нельзя.</p>
     <button id="resetBtn" class="danger">Начать сначала</button></div>`;
@@ -75,7 +76,7 @@ function renderPanel(){
   list.innerHTML=h;
   if(tab==='map') afterMap();
   if(tab==='skill' && imgReady) SK.forEach((s,i)=>frameThumb($('ti'+i),s.who,s.icon[0],s.icon[1]));
-  if(tab==='profile'){ const rb=$('resetBtn'); let rArm=false;
+  if(tab==='profile'){ const rb=$('resetBtn'); let rArm=false; if($('logoutBtn')) $('logoutBtn').onclick=logout;
     rb.onclick=()=>{ if(!rArm){ rArm=true; rb.classList.add('armed'); rb.textContent='Точно? Нажми ещё раз'; setTimeout(()=>{ if(rb.isConnected){ rArm=false; rb.classList.remove('armed'); rb.textContent='Начать сначала'; } },4000); return; } newGame(); }; }
   panelTick();
 }
