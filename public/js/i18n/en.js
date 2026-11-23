@@ -672,5 +672,6 @@ I18N.en={
 "Куплено": "Bought",
 "Подарок от администрации": "A gift from the administration",
 "вы заблокированы в чате": "you are banned from chat",
-"Админ-панель": "Admin panel"
+"Админ-панель": "Admin panel",
+"Осколки души": "Soul shards"
 };
