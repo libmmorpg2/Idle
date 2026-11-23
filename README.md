@@ -61,7 +61,9 @@ npm start                   # http://localhost:3000
 | GET   | `/api/save`          | → `{ state \| null, rev }` |
 | PUT   | `/api/save`          | `{ state, rev }` → `{ rev }`; `409`, если игра открыта в другой вкладке/устройстве |
 | GET   | `/api/chat?after=id` | новые сообщения чата (без `after` — последние 50) |
-| POST  | `/api/chat`          | `{ text, hero, lvl }` → `{ message }`; `429` — слишком часто (1 раз в 1,5 с, до 15 в минуту) |
+| POST  | `/api/chat`          | `{ text, hero, lvl, to?, replyTo? }` → `{ message }`; `to` — личное сообщение; `429` — слишком часто (1 раз в 1,5 с, до 15 в минуту); `403` — получатель вас заблокировал |
+| POST  | `/api/chat/block`    | `{ id, block }` — заблокировать / разблокировать игрока |
+| GET   | `/api/chat/player/:id` | карточка игрока: имя, герой, уровень, рекорд, даты |
 
 Авторизация: `Authorization: Bearer <token>` или кука `sid`.
 
@@ -71,7 +73,7 @@ npm start                   # http://localhost:3000
 server/index.js         сервер: раздаёт public/, вход и API сохранений
 server/telegram.js      проверка подписи данных Telegram
 server/chat.js          API общего чата
-db/schema.sql           схема таблиц players, player_saves, chat_messages
+db/schema.sql           схема таблиц players, player_saves, chat_messages, chat_blocks
 public/index.html       разметка + подключение стилей и скриптов
 public/css/style.css    все стили
 public/assets/img/      графика (атлас спрайтов героев, портреты, иконки HUD)

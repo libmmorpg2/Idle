@@ -28,3 +28,16 @@ CREATE TABLE IF NOT EXISTS chat_messages (
   lvl        integer,
   created_at timestamptz NOT NULL DEFAULT now()
 );
+
+-- Личные сообщения (to_tg_id) и ответы (reply_to).
+ALTER TABLE chat_messages ADD COLUMN IF NOT EXISTS to_tg_id bigint REFERENCES players (tg_id) ON DELETE CASCADE;
+ALTER TABLE chat_messages ADD COLUMN IF NOT EXISTS reply_to bigint REFERENCES chat_messages (id) ON DELETE SET NULL;
+CREATE INDEX IF NOT EXISTS chat_messages_dm ON chat_messages (to_tg_id, tg_id) WHERE to_tg_id IS NOT NULL;
+
+-- Кого игрок заблокировал: его сообщения не показываются, писать в личку он не может.
+CREATE TABLE IF NOT EXISTS chat_blocks (
+  tg_id      bigint      NOT NULL REFERENCES players (tg_id) ON DELETE CASCADE,
+  blocked_id bigint      NOT NULL REFERENCES players (tg_id) ON DELETE CASCADE,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  PRIMARY KEY (tg_id, blocked_id)
+);
